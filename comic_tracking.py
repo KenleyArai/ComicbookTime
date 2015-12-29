@@ -9,6 +9,7 @@ import sqlite3
 import requests as rq
 import pandas as pd
 
+import sqlalchemy
 from datetime import datetime
 from bs4 import BeautifulSoup as bs
 
@@ -24,6 +25,7 @@ def get_marvel_dataframe(url):
     marvel = []
     urls = []
     titles = []
+    notes = []
     comics = pd.DataFrame()
 
     r = rq.get(url)
@@ -39,15 +41,22 @@ def get_marvel_dataframe(url):
         if paragraph.b and "MARVEL COMICS" == paragraph.b.u.string:
             marvel = paragraph        
 
-    print(marvel)
     for a in marvel.findAll('a'):
-        urls   += [a['href']]
-        titles += [a.string]
+        if "Variant" not in a.string: 
+            title = a.string.split("#")
+            if len(title) > 1:
+                title[0] = title[0] + "#" + title[1][0]
+                title[1] = title[1][1:]
+
+                urls   += [a['href']]
+                titles += [title[0]]
+                notes += [title[1]]
 
     comics['url'] = pd.Series(urls)
     comics['title'] = pd.Series(titles)
     comics['release_date'] = pd.Series([date for _ in urls])
-    
+    comics['notes'] = pd.Series(notes)
+
     return comics
 
 
@@ -62,4 +71,7 @@ def update_marvel_database(urls):
 
 def update_db(database, dataframe, table):
     e = engine
-    dataframe.to_sql(name=table, con=e, if_exists="append", index=False)
+    df = pd.read_sql("comics", con=e)
+    new_df = pd.concat([df, dataframe])
+    new_df.drop_duplicates(subset=['title','release_date'], inplace=True)
+    new_df.to_sql(name=table, con=e, if_exists="replace", index=False)

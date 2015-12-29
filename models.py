@@ -13,9 +13,10 @@ class Users(Base):
 
 class Comics(Base):
     __tablename__ = "comics"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
     title = Column(String)
     url   = Column(String)
+    notes = Column(String)
     release_date = Column(Date)
 
     parent_id = Column(Integer, ForeignKey('users.id'))
