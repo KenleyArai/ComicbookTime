@@ -17,13 +17,17 @@ marvel_urls = ["http://www.comiclist.com/index.php/newreleases/last-week",
 
 @app.route('/')
 def index():
-    return "Test"
+    return render_template('main.html')
 
 @app.route('/find', methods=['GET', 'POST'])
 def find():
     if request.method == 'POST':
-        s = select([Comics.title]).where(Comics.title.like("%" + request.form['comic'] + "%"))
-        result = [x[0] for x in db_session.execute(s).fetchall()]
+        columns = [Comics.title, Comics.release_date]
+        mask = "".join(["%", request.form['comic'], "%"])
+        mask = Comics.title.like(mask)
+        s = select(columns).where(mask)
+        result = {x[0]:x[1] for x in db_session.execute(s).fetchall()}
+
         return render_template('find.html', found=result)
     return render_template('find.html') 
 
