@@ -23,6 +23,13 @@ def index():
 @app.route('/find', methods=['GET', 'POST'])
 def find():
     if request.method == 'POST':
+        search = request.form['comic']
+        cmd = None
+        if ">" in search:
+            search = search.split(">")
+            cmd = search[0]
+            search = search[1]
+
         columns = [Comics.id,
                    Comics.title,
                    Comics.release_date,
@@ -30,11 +37,16 @@ def find():
                    Comics.notes,
                    Comics.availability]
 
-        mask = "".join(["%", request.form['comic'], "%"])
+        mask = "".join(["%", search,"%"])
         mask = Comics.title.like(mask)
         s = select(columns).where(mask)
 
         result = [x for x in db_session.execute(s).fetchall()]
+        if cmd:
+            if "A" in cmd or "a" in cmd:
+                result = [x for x in result if x[5]]
+            elif 'U' in cmd or 'u' in cmd:
+                result = [x for x in result if not x[5]]
         result = [result[n:n+3] for n in range(0, len(result), 3)]
 
         return render_template('find.html', found=result)
