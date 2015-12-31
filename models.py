@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Sequence, ForeignKey, Date, Table
+from sqlalchemy import Column, Integer, String, Sequence, ForeignKey, Date, Table, Boolean
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -13,7 +13,7 @@ class User(Base):
     __tablename__ = 'user'
     id = Column(Integer, Sequence('user_id_seq'), primary_key=True)
     name = Column(String)
-    
+
     series_child = relationship("Series", secondary=has_sub, back_populates='user_child')
 
 class Series(Base):
@@ -22,15 +22,15 @@ class Series(Base):
     name = Column(String)
 
     user_child = relationship('User', secondary=has_sub, back_populates='series_child')
-    comic_child = relationship("Comics") 
+    comic_child = relationship("Comics")
 
 class Comics(Base):
     __tablename__ = 'comics'
-    comicID = Column(Integer, Sequence('comic_id_seq'), primary_key=True)
+    id = Column(Integer, Sequence('comic_id_seq'), primary_key=True)
     title = Column(String)
     url   = Column(String)
     notes = Column(String)
     release_date = Column(Date)
     image_link = Column(String)
-
+    availability = Column(Boolean)
     seriesID = Column(Integer, ForeignKey('series.id'))
