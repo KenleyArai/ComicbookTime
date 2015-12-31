@@ -43,12 +43,18 @@ def update_series(df):
         else:
             options = process.extract(title, result)
             maximum = max(options, key=itemgetter(1))
+            if maximum[1] < 85:
+                comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
+                new_series = Series(name=title, comic_child=[child_comic])
 
-            comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
-            series = db_session.query(Series).filter_by(name=title)[0]
-            comic_child.seriesID = series.id
+                db_session.add(new_series)
+                db_session.commit()
+            else:
+                comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
+                series = db_session.query(Series).filter_by(name=title)[0]
+                comic_child.seriesID = series.id
 
-            db_session.commit()
+                db_session.commit()
             
 
 def get_marvel_dataframe(url):
