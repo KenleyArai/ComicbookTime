@@ -8,6 +8,11 @@ has_sub = Table('has_sub', Base.metadata,
                )
 
 
+owns_comic = Table('owns_comic', Base.metadata,
+                Column('user_id', Integer, ForeignKey('user.id')),
+                Column('comic_id', Integer, ForeignKey('comics.id'))
+               )
+
 # Entities
 class User(Base):
     __tablename__ = 'user'
@@ -15,6 +20,8 @@ class User(Base):
     name = Column(String)
 
     series_child = relationship("Series", secondary=has_sub, back_populates='user_child')
+    comic_child = relationship('Comics', secondary=owns_comic, back_populates='user_child')
+
 
 class Series(Base):
     __tablename__ = 'series'
@@ -34,6 +41,8 @@ class Comics(Base):
     image_link = Column(String)
     availability = Column(Boolean)
     seriesID = Column(Integer, ForeignKey('series.id'))
+
+    user_child = relationship('User', secondary=owns_comic, back_populates='comic_child')
 
     def get(self):
         return (self.id, self.title,

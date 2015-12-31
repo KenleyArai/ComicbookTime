@@ -2,7 +2,7 @@ import comic_tracking
 import flask_resize
 
 from flask import Flask, abort, request,redirect, url_for, render_template
-from models import User, Comics, has_sub, Series
+from models import User, Comics, has_sub, Series, owns_comic
 from fuzzyfinder import fuzzyfinder
 from sqlalchemy.sql import select, insert, update
 
@@ -19,16 +19,33 @@ marvel_urls = ["http://www.comiclist.com/index.php/newreleases/last-week",
 @app.route('/')
 def index():
     subscriptions = db_session.query(has_sub).filter_by(user_id=1).all()
+    user = db_session.query(User).filter_by(id=1).one()
+    bought = user.comic_child
     result = [x[1] for x in subscriptions]
+
     if result:
         c = []
         for r in result:
-            c.append(db_session.query(Comics).filter_by(seriesID=r).first().get())
-
+            new_comics = [x for x in db_session.query(Comics).filter_by(seriesID=r).order_by(Comics.id.desc()).all()]
+            for nc in new_comics:
+                if nc not in bought:
+                    c.append(nc.get())
         result = [c[n:n+3] for n in range(0, len(c), 3)]
         return render_template('main.html', comics=result)
 
     return render_template('main.html')
+
+
+@app.route('/bought', methods=['GET', 'POST'])
+def bought():
+    u_id = request.args.get('u_id')
+    c_id = request.args.get('c_id')
+    comic = db_session.query(Comics).filter_by(id=c_id).one()
+    user = db_session.query(User).filter_by(id=1).one()
+    user.comic_child.append(comic)
+    db_session.commit()
+
+    return redirect(url_for('index'))
 
 @app.route('/find', methods=['GET', 'POST'])
 def find():
@@ -53,6 +70,7 @@ def find():
         s = select(columns).where(mask)
 
         result = [x for x in db_session.execute(s).fetchall()]
+
         if cmd:
             if "A" in cmd or "a" in cmd:
                 result = [x for x in result if x[5]]
