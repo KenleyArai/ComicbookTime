@@ -34,3 +34,12 @@ class Comics(Base):
     image_link = Column(String)
     availability = Column(Boolean)
     seriesID = Column(Integer, ForeignKey('series.id'))
+
+    def get(self):
+        return (self.id, self.title,
+               self.release_date,
+               self.url,
+               self.notes,
+               self.availability,
+               self.seriesID)
+

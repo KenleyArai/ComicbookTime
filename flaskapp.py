@@ -2,9 +2,9 @@ import comic_tracking
 import flask_resize
 
 from flask import Flask, abort, request,redirect, url_for, render_template
-from models import User, Comics
+from models import User, Comics, has_sub, Series
 from fuzzyfinder import fuzzyfinder
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, insert, update
 
 from database import db_session
 
@@ -18,6 +18,16 @@ marvel_urls = ["http://www.comiclist.com/index.php/newreleases/last-week",
 
 @app.route('/')
 def index():
+    subscriptions = db_session.query(has_sub).filter_by(user_id=1).all()
+    result = [x[1] for x in subscriptions]
+    if result:
+        c = []
+        for r in result:
+            c.append(db_session.query(Comics).filter_by(seriesID=r).first().get())
+
+        result = [c[n:n+3] for n in range(0, len(c), 3)]
+        return render_template('main.html', comics=result)
+
     return render_template('main.html')
 
 @app.route('/find', methods=['GET', 'POST'])
@@ -35,7 +45,8 @@ def find():
                    Comics.release_date,
                    Comics.image_link,
                    Comics.notes,
-                   Comics.availability]
+                   Comics.availability,
+                   Comics.seriesID]
 
         mask = "".join(["%", search,"%"])
         mask = Comics.title.like(mask)
@@ -51,6 +62,26 @@ def find():
 
         return render_template('find.html', found=result)
     return render_template('find.html', found={})
+
+
+@app.route('/series', methods=['GET'])
+def series():
+    s_id = request.args.get('id')
+    sub = request.args.get('sub')
+    if not sub:
+        series_comics = db_session.query(Comics).filter_by(seriesID=s_id).all()
+        series_comics = [x.get() for x in series_comics]
+        result = [series_comics[n:n+3] for n in range(0, len(series_comics), 3)]
+
+        return render_template('series.html', found=result, series_id=s_id)
+    else:
+        series = db_session.query(Series).filter_by(id=s_id).one()
+        user = db_session.query(User).filter_by(id=1).one()
+        user.series_child.append(series)
+        db_session.commit()
+    return redirect(url_for('index'))
+
+
 
 @app.route('/marvel_update')
 def marvel_update():
