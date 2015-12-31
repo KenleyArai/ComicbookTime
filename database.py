@@ -14,7 +14,7 @@ Base.query = db_session.query_property()
 def init_db():
     import models
     Base.metadata.create_all(bind=engine)
-    default_user = models.Users(name="Kenley")
+    default_user = models.User(name="Kenley")
     db_session.add(default_user)
     db_session.commit()
 

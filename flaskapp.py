@@ -1,7 +1,7 @@
 import comic_tracking
 
 from flask import Flask, abort, request,redirect, url_for, render_template
-from models import Users, Comics 
+from models import User, Comics 
 from fuzzyfinder import fuzzyfinder
 
 from sqlalchemy.sql import select
@@ -27,9 +27,8 @@ def find():
         mask = Comics.title.like(mask)
         s = select(columns).where(mask)
         result = {x[0]:x[1] for x in db_session.execute(s).fetchall()}
-
         return render_template('find.html', found=result)
-    return render_template('find.html') 
+    return render_template('find.html', found={}) 
 
 @app.route('/marvel_update')
 def marvel_update():

@@ -14,15 +14,42 @@ import pandas as pd
 from sqlalchemy.sql import select
 from datetime import datetime
 from bs4 import BeautifulSoup as bs
-
-from models import Comics 
+from fuzzywuzzy import process
+from models import Comics, Series 
 from database import engine, db_session
+from operator import itemgetter
 
 DATABASE = "./comics.db"
 TABLE = "comics"
 
 
 # In[115]:
+
+def update_series(df):
+    for index, data in df.iterrows():
+        title = data['title'][:-3]
+        columns = [Series.name]
+        mask = "".join(["%", title,"%"])
+        mask = Series.name.like(mask)
+        s = select(columns).where(mask)
+        result = [x[0] for x in db_session.execute(s).fetchall()]
+
+        if not result:
+            comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
+            new_series = Series(name=title, comic_child=[child_comic])
+
+            db_session.add(new_series)
+            db_session.commit()
+        else:
+            options = process.extract(title, result)
+            maximum = max(options, key=itemgetter(1))
+
+            comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
+            series = db_session.query(Series).filter_by(name=title)[0]
+            comic_child.seriesID = series.id
+
+            db_session.commit()
+            
 
 def get_marvel_dataframe(url):
     marvel = []
@@ -55,16 +82,17 @@ def get_marvel_dataframe(url):
                  
                 result = db_session.execute(s).fetchone()
 
-                if not result: 
-                    urls   += [a['href']]
-                    titles += [title[0]]
-                    notes += [title[1]]
+                #if not result: 
+                urls   += [a['href']]
+                titles += [title[0]]
+                notes += [title[1]]
 
     comics['url'] = pd.Series(urls)
     comics['title'] = pd.Series(titles)
     comics['release_date'] = pd.Series([date for _ in urls])
     comics['notes'] = pd.Series(notes)
 
+    
     return comics
 
 
@@ -79,5 +107,7 @@ def update_marvel_database(urls):
 
 def update_db(database, dataframe, table):
     e = engine
+
     if len(dataframe) != 0:
         dataframe.to_sql(name=table, con=e, if_exists="append", index=False)
+        update_series(dataframe)
