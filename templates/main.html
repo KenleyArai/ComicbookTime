@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if comics %}
+
+{% for x in comics%}
+  <div class="row">
+  {% for id, title, date, link, note, availability, seriesID in x %}
+    <div class="col-xs-6 col-md-4">
+      <div class="thumbnail">
+        <a href="/series?id={{seriesID}}">
+        <img src="static/covers/{{id}}.png" class="img-responsive" />
+        </a>
+          <div class="caption">
+            <h4>{{title}}</h4>
+            <ul class="list-group">
+            {% if availability %}
+              <li class="list-group-item list-group-item-success">This comic is available!</li>
+              <li class="list-group-item list-group-item-info">Release Date: {{date}}</li>
+              <a href="/bought?c_id={{id}}&u_id=1">
+              <li class="list-group-item list-group-item-warning">Bought it</li>
+              </a>
+            {% else %}
+            <li class="list-group-item list-group-item-danger">This comic is not available yet!</li>
+              <li class="list-group-item list-group-item-info">Release Date: {{date}}</li>
+            {% endif %}
+
+
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{% endfor %}
+{% endif %}
+
+
+{% endblock %}
