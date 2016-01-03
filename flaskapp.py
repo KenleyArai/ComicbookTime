@@ -2,24 +2,17 @@ import comic_tracking
 import json
 from flask_oauth import OAuth
 
-from datetime import datetime
-
 from flask import Flask, request,redirect, url_for, render_template, session
 from models import User, Comics, has_sub, Series
 from sqlalchemy.sql import select
 
 from database import db_session
+from global_var import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,REDIRECT_URI,SECRET_KEY
 import requests as rq
-
-GOOGLE_CLIENT_ID = ''
-GOOGLE_CLIENT_SECRET = ''
-REDIRECT_URI = '/oauth2callback'
-
 
 app = Flask(__name__)
 
 app.debug = True
-SECRET_KEY = 'development key'
 app.secret_key = SECRET_KEY
 oauth = OAuth()
 
@@ -51,8 +44,6 @@ def check_login():
     if req.status_code == 401:
         return False
     login = json.loads(req.text)
-    if login['given_name'] != "Kenley":
-        return False
     return login
 
 
@@ -63,8 +54,7 @@ def index():
 
     if not login:
         session.pop('access_token', None)
-        return redirect(url_for('login'))
-
+        return render_template('main.html')
     user = db_session.query(User).filter_by(id=login['id']).first()
 
     if not user:
@@ -87,6 +77,11 @@ def index():
         result = [c[n:n+3] for n in range(0, len(c), 3)]
         return render_template('main.html', comics=result, login=login['given_name'])
 
+    return render_template('main.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('access_token', None)
     return render_template('main.html')
 
 @app.route('/login')
@@ -175,6 +170,9 @@ def series():
 
 @app.route('/marvel_update')
 def marvel_update():
+    login = check_login()
+    if login['given_name'] != "Kenley":
+        return redirect(url_for('index'))
     comic_tracking.update_marvel_database(marvel_urls)
     return redirect(url_for('index'))
 

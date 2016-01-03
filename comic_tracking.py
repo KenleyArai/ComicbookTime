@@ -19,7 +19,6 @@ from database import engine, db_session
 from operator import itemgetter
 from time import sleep
 
-DATABASE = "./comics.db"
 TABLE = "comics"
 
 # In[115]:
@@ -57,7 +56,7 @@ def update_series(df):
                 db_session.commit()
 
 
-def download_image(url, comic_id):
+def download_kimage(url, comic_id):
     if not url or "no-image" in url:
         return None
     r = rq.get(url, stream=True)
@@ -83,6 +82,7 @@ def get_image(url):
             image_url = None
 
     return image_url
+
 
 def get_marvel_dataframe(url):
     marvel = []
@@ -132,9 +132,9 @@ def update_marvel_database(urls):
 
     without_dups = pd.concat(frames)
     without_dups.drop_duplicates(['title'], inplace=True)
-    update_db(DATABASE, without_dups, TABLE)
+    update_db(without_dups, TABLE)
 
-def update_db(database, dataframe, table):
+def update_db(dataframe, table):
     e = engine
 
     if len(dataframe) != 0:

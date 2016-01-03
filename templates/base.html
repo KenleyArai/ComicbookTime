@@ -9,20 +9,17 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>Comic Book Time!</title>
 
     <!-- Bootstrap core CSS -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="static/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+    <link href="static/css/bootstrap-social.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="static/starter-template.css" rel="stylesheet">
-
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="static/js/ie-emulation-modes-warning.js"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -32,7 +29,6 @@
   </head>
 
   <body>
-
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -51,7 +47,13 @@
             <li><a href="/marvel_update">Update Marvel Database</a></li>
           </ul>
           {% if login %}
-          <p class="navbar-text navbar-right"> {{ login }}</p>
+          <p class="navbar-text navbar-right"> {{ login }}
+          <a href="/logout">logout</a>
+          </p>
+          {% else %}
+          <a href="/login" class="btn btn-social-icon btn-google navbar-right navbar-btn">
+            <span class="fa fa-google"></span>
+          </a>
           {% endif %}
         </div><!--/.nav-collapse -->
       </div>
@@ -60,7 +62,8 @@
     <div class="container">
 
       <div class="starter-template">
-      {% block content %}{% endblock %}
+      {% block content %}
+      {% endblock %}
       </div>
 
     </div><!-- /.container -->
@@ -80,6 +83,5 @@
   $('a[href="' + this.location.pathname + '"]').parents('li,ul').addClass('active');
   </script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="static/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
