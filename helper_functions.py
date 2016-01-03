@@ -8,7 +8,7 @@ def get_series_by_series_id(s_id):
     return db_session.query(Series).filter_by(id=s_id)
 
 def get_comics_by_series_id(s_id):
-    return db_session.query(Comics).filter_by(id=s_id)
+    return db_session.query(Comics).filter_by(seriesID=s_id)
 
 def get_all_comics_by_series_id(s_id, convert=False):
     if convert:
