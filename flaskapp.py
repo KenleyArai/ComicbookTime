@@ -2,12 +2,13 @@ import comic_tracking
 import json
 from flask_oauth import OAuth
 
+from views import main,find_view,series_view
 from flask import Flask, request,redirect, url_for, render_template, session
 from models import User, Comics, has_sub, Series
-from sqlalchemy.sql import select
 
 from database import db_session
 from global_var import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,REDIRECT_URI,SECRET_KEY
+
 import requests as rq
 
 app = Flask(__name__)
@@ -32,7 +33,8 @@ marvel_urls = ["http://www.comiclist.com/index.php/newreleases/last-week",
                "http://www.comiclist.com/index.php/newreleases/this-week",
                "http://www.comiclist.com/index.php/newreleases/next-week"]
 
-def check_login():
+# Helper functions
+def get_login():
     access_token = session.get('access_token')
     if access_token is None:
         return False
@@ -46,38 +48,18 @@ def check_login():
     login = json.loads(req.text)
     return login
 
-
-@app.route('/')
-def index():
-
-    login = check_login()
-
+def check_login(login, else_page_func, *args):
     if not login:
         session.pop('access_token', None)
         return render_template('main.html')
-    user = db_session.query(User).filter_by(id=login['id']).first()
+    else:
+        return else_page_func(login, *args)
 
-    if not user:
-        user = User(id=login['id'],name=login['given_name'])
-        db_session.add(user)
-        db_session.commit()
+def with_out_check_login(login, else_page_func, *args):
+    return else_page_func(login, *args)
 
-    subscriptions = db_session.query(has_sub).filter_by(user_id=login['id']).all()
-    bought = user.comic_child
-    result = [x[1] for x in subscriptions]
 
-    if result:
-        c = []
-        for r in result:
-            new_comics = [x for x in db_session.query(Comics).filter_by(seriesID=r).order_by(Comics.id.desc()).all()]
-            for nc in new_comics:
-                if nc not in bought:
-                    c.append(nc.get())
-        c = sorted(c, key=lambda x: not x[5])
-        result = [c[n:n+3] for n in range(0, len(c), 3)]
-        return render_template('main.html', comics=result, login=login['given_name'])
-
-    return render_template('main.html')
+# Pages without views
 
 @app.route('/logout')
 def logout():
@@ -89,6 +71,22 @@ def login():
     callback=url_for('authorized', _external=True)
     return google.authorize(callback=callback)
 
+@app.route('/bought', methods=['GET', 'POST'])
+def bought():
+
+    login = get_login()
+    if not login:
+        session.pop('access_token', None)
+        return render_template('main.html')
+
+    c_id = request.args.get('c_id')
+    comic = db_session.query(Comics).filter_by(id=c_id).one()       # Getting specific comic
+    user = db_session.query(User).filter_by(id=login['id']).one()   # Getting specific user
+    user.comic_child.append(comic)                                  # Updating the bought relation
+    db_session.commit()
+
+    return redirect(url_for('index'))
+
 @app.route(REDIRECT_URI)
 @google.authorized_handler
 def authorized(resp):
@@ -96,98 +94,34 @@ def authorized(resp):
     session['access_token'] = access_token, ''
     return redirect(url_for('index'))
 
-
 @google.tokengetter
 def get_access_token():
     return session.get('access_token')
 
-@app.route('/bought', methods=['GET', 'POST'])
-def bought():
-
-    login = check_login()
-
-    if not login:
-        session.pop('access_token', None)
-        return render_template('main.html')
-
-    c_id = request.args.get('c_id')
-    comic = db_session.query(Comics).filter_by(id=c_id).one()
-    user = db_session.query(User).filter_by(id=login['id']).one()
-    user.comic_child.append(comic)
-    db_session.commit()
-
-    return redirect(url_for('index'))
-
-@app.route('/find', methods=['GET', 'POST'])
-def find():
-
-    login = check_login()
-
-    if request.method == 'POST':
-        search = request.form['comic']
-        cmd = None
-        if ">" in search:
-            search = search.split(">")
-            cmd = search[0]
-            search = search[1]
-
-        columns = [Comics.id,
-                   Comics.title,
-                   Comics.release_date,
-                   Comics.image_link,
-                   Comics.notes,
-                   Comics.availability,
-                   Comics.seriesID]
-
-        mask = "".join(["%", search,"%"])
-        mask = Comics.title.like(mask)
-        s = select(columns).where(mask)
-
-        result = [x for x in db_session.execute(s).fetchall()]
-
-        if cmd:
-            if "A" in cmd or "a" in cmd:
-                result = [x for x in result if x[5]]
-            elif 'U' in cmd or 'u' in cmd:
-                result = [x for x in result if not x[5]]
-        result = [result[n:n+3] for n in range(0, len(result), 3)]
-
-        if login:
-            return render_template('find.html', found=result, login=login['given_name'])
-        else:
-            return render_template('find.html', found=result)
-    if login:
-        return render_template('find.html', found={}, login=login['given_name'])
-    else:
-        return render_template('find.html', found={})
-
-
-
-@app.route('/series', methods=['GET'])
-def series():
-    s_id = request.args.get('id')
-    sub = request.args.get('sub')
-    if not sub:
-        series_comics = db_session.query(Comics).filter_by(seriesID=s_id).all()
-        series_comics = [x.get() for x in series_comics]
-        result = [series_comics[n:n+3] for n in range(0, len(series_comics), 3)]
-
-        return render_template('series.html', login=login['given_name'],found=result, series_id=s_id)
-    else:
-        login = check_login()
-        series = db_session.query(Series).filter_by(id=s_id).one()
-        user = db_session.query(User).filter_by(id=login['id']).one()
-        user.series_child.append(series)
-        db_session.commit()
-    return redirect(url_for('index'))
-
 @app.route('/marvel_update')
 def marvel_update():
-    login = check_login()
+    login = get_login()
     if login['given_name'] != "Kenley":
         return redirect(url_for('index'))
     comic_tracking.update_marvel_database(marvel_urls)
     return redirect(url_for('index'))
+
+# Pages with views
+@app.route('/')
+def index():
+    login = get_login()
+    return check_login(login, main.main)
+
+
+@app.route('/find', methods=['GET', 'POST'])
+def find():
+    login = get_login()
+    return with_out_check_login(login, find_view.find_view, request)
+
+@app.route('/series', methods=['GET'])
+def series():
+    login = get_login()
+    return check_login(login, series_view.series_view, request)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
