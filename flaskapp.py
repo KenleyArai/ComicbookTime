@@ -42,7 +42,7 @@ marvel_urls = ["http://www.comiclist.com/index.php/newreleases/last-week",
 def check_login():
     access_token = session.get('access_token')
     if access_token is None:
-        return redirect(url_for('login'))
+        return False
     access_token = access_token[0]
 
     headers = {'Authorization': 'OAuth '+access_token}
