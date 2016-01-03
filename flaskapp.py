@@ -73,7 +73,7 @@ def index():
             for nc in new_comics:
                 if nc not in bought:
                     c.append(nc.get())
-
+        c = sorted(c, key=lambda x: not x[5])
         result = [c[n:n+3] for n in range(0, len(c), 3)]
         return render_template('main.html', comics=result, login=login['given_name'])
 
@@ -106,7 +106,10 @@ def bought():
 
     login = check_login()
 
-    u_id = request.args.get('u_id')
+    if not login:
+        session.pop('access_token', None)
+        return render_template('main.html')
+
     c_id = request.args.get('c_id')
     comic = db_session.query(Comics).filter_by(id=c_id).one()
     user = db_session.query(User).filter_by(id=login['id']).one()
@@ -117,6 +120,9 @@ def bought():
 
 @app.route('/find', methods=['GET', 'POST'])
 def find():
+
+    login = check_login()
+
     if request.method == 'POST':
         search = request.form['comic']
         cmd = None
@@ -146,8 +152,15 @@ def find():
                 result = [x for x in result if not x[5]]
         result = [result[n:n+3] for n in range(0, len(result), 3)]
 
-        return render_template('find.html', found=result)
-    return render_template('find.html', found={})
+        if login:
+            return render_template('find.html', found=result, login=login['given_name'])
+        else:
+            return render_template('find.html', found=result)
+    if login:
+        return render_template('find.html', found={}, login=login['given_name'])
+    else:
+        return render_template('find.html', found={})
+
 
 
 @app.route('/series', methods=['GET'])
@@ -159,7 +172,7 @@ def series():
         series_comics = [x.get() for x in series_comics]
         result = [series_comics[n:n+3] for n in range(0, len(series_comics), 3)]
 
-        return render_template('series.html', found=result, series_id=s_id)
+        return render_template('series.html', login=login['given_name'],found=result, series_id=s_id)
     else:
         login = check_login()
         series = db_session.query(Series).filter_by(id=s_id).one()
