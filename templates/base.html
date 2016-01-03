@@ -44,7 +44,12 @@
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
             <li><a href="/find">Find</a></li>
+          {% if login %}
+            <li><a href="/my_collection">My Collection</a></li>
+          {% endif %}
+          {% if login == "Kenley" %}
             <li><a href="/marvel_update">Update Marvel Database</a></li>
+          {% endif %}
           </ul>
           {% if login %}
           <p class="navbar-text navbar-right"> {{ login }}
