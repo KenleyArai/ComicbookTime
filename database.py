@@ -10,11 +10,9 @@ db_session = scoped_session(sessionmaker(autocommit=False,autoflush=False,bind=e
 Base = declarative_base()
 Base.query = db_session.query_property()
 
-
 def init_db():
     import models
     Base.metadata.create_all(bind=engine)
-    default_user = models.User(name="Kenley")
+    default_user = models.User(id="0", name="default")
     db_session.add(default_user)
     db_session.commit()
-
