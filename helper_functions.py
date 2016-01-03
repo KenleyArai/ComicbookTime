@@ -1,5 +1,5 @@
 from database import db_session
-from models import User, Comics, Series
+from models import User, Comics, Series, has_sub
 
 def convet_comic_to_tuples(l):
     return [x.get() for x in l]
@@ -17,6 +17,9 @@ def get_all_comics_by_series_id(s_id, convert=False):
 
 def get_user_by_uid(uid):
     return db_session.query(User).filter_by(id=uid)
+
+def get_subs_by_uid(uid):
+    return db_session.query(has_sub).filter_by(user_id=uid)
 
 def get_tuple_rows(l, columns):
     return [l[n:n+columns] for n in range(0, len(l), columns)]

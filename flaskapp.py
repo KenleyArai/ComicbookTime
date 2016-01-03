@@ -2,9 +2,9 @@ import comic_tracking
 import json
 from flask_oauth import OAuth
 
-from views import main,find_view,series_view
+from views import main,find_view,series_view,my_collection
 from flask import Flask, request,redirect, url_for, render_template, session
-from models import User, Comics, has_sub, Series
+from models import User, Comics
 
 from database import db_session
 from global_var import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,REDIRECT_URI,SECRET_KEY
@@ -112,6 +112,10 @@ def index():
     login = get_login()
     return check_login(login, main.main)
 
+@app.route('/my_collection')
+def my_c():
+    login = get_login()
+    return check_login(login, my_collection.my_collection)
 
 @app.route('/find', methods=['GET', 'POST'])
 def find():

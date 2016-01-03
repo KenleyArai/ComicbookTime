@@ -1,6 +1,6 @@
 from flask import render_template
-from models import Comics
-from database import db_session
+from ..models import Comics
+from ..database import db_session
 
 
 def find_view(login, request):

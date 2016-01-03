@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if subs %}
+{% for series in subs%}
+<div class="jumbotron">
+  <div class="container">
+    <h2>{{ series[0][0][1][:-3]  }}</h2>
+  {% for comic in series %}
+  <div class="row">
+  {% for id, title, date, link, note, availability, seriesID in comic %}
+    <div class="col-xs-6 col-md-2">
+      <div class="thumbnail">
+        <a href="/series?id={{seriesID}}">
+        <img src="static/covers/{{id}}.png" class="img-responsive" />
+        </a>
+          <div class="caption">
+            <h4>{{title}}</h4>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{% endfor %}
+
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="jumbotron">
+  <h1>Try it out!<h1>
+    <p>Start out by signing up with Google, or search without logging in!</p>
+</div>
+
+{% endif %}
+
+{% endblock %}
