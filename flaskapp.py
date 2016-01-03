@@ -60,6 +60,7 @@ def check_login():
 def index():
 
     login = check_login()
+
     if not login:
         session.pop('access_token', None)
         return redirect(url_for('login'))
