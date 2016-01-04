@@ -88,7 +88,7 @@
         $(document).ready(function(){
             namespace = ''; // change to an empty string to use the global namespace
 
-            $('#myButton').on('click', function () {
+            $('button.btn').on('click', function () {
               var $btn = $(this).button('loading')
               var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
               var $comic_id = this.getAttribute('desc')
