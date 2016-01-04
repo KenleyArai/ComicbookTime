@@ -1,21 +1,54 @@
 import comic_tracking
 import json
-from flask_oauth import OAuth
+import time
 
+from threading import Thread
+from flask_oauth import OAuth
 from views import main,find_view,series_view,my_collection
 from flask import Flask, request,redirect, url_for, render_template, session
 from models import User, Comics
-
 from database import db_session
 from global_var import GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,REDIRECT_URI,SECRET_KEY
 
+from flask_socketio import SocketIO, emit, join_room, leave_room, \
+    close_room, rooms, disconnect
+
 import requests as rq
 
-app = Flask(__name__)
+async_mode = None
 
+if async_mode is None:
+    try:
+        import eventlet
+        async_mode = 'eventlet'
+    except ImportError:
+        pass
+
+    if async_mode is None:
+        try:
+            from gevent import monkey
+            async_mode = 'gevent'
+        except ImportError:
+            pass
+
+    if async_mode is None:
+        async_mode = 'threading'
+
+    print('async_mode is ' + async_mode)
+
+if async_mode == 'eventlet':
+    import eventlet
+    eventlet.monkey_patch()
+elif async_mode == 'gevent':
+    from gevent import monkey
+    monkey.patch_all()
+
+app = Flask(__name__)
 app.debug = True
 app.secret_key = SECRET_KEY
 oauth = OAuth()
+socketio = SocketIO(app, async_mode=async_mode)
+thread = None
 
 google = oauth.remote_app('google',
                           base_url='https://www.google.com/accounts/',
@@ -109,6 +142,7 @@ def marvel_update():
 # Pages with views
 @app.route('/')
 def index():
+    init_thread()
     login = get_login()
     return check_login(login, main.main)
 
@@ -131,5 +165,41 @@ def series():
 def shutdown_session(exception=None):
     db_session.remove()
 
+# Sockets
+
+def background_thread():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    while True:
+        time.sleep(10)
+        count += 1
+        socketio.emit('my response',
+                      {'data': 'Server generated event', 'count': count},
+                      namespace='/test')
+
+def init_thread():
+    global thread
+    if thread is None:
+        thread = Thread(target=background_thread)
+        thread.daemon = True
+        thread.start()
+
+@socketio.on('unbuy', namespace='/test')
+def test_message(message):
+    c_id = message['data']
+    login = get_login()
+
+    if not login:
+        session.pop('access_token', None)
+
+    comic = db_session.query(Comics).filter_by(id=c_id).one()       # Getting specific comic
+    user = db_session.query(User).filter_by(id=login['id']).one()   # Getting specific user
+    user.comic_child.remove(comic)                                  # Updating the bought relation
+    db_session.commit()
+
+@socketio.on('disconnect', namespace='/test')
+def test_disconnect():
+    print('Client disconnected', request.sid)
+
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app, debug=True)

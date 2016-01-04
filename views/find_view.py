@@ -14,5 +14,6 @@ def find_view(login, request):
         comics = [comics[n:n+3] for n in range(0, len(comics), 3)]
         return render_template('find.html',
                                found=comics,
-                               login=login['given_name'] if login else None)
-    return render_template('find.html')
+                               login=login['given_name'] if login else none)
+    return render_template('find.html', login=login['given_name'] if login else none)
+

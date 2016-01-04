@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
+
 {% if subs %}
 {% for series in subs%}
 <div class="jumbotron">
@@ -11,11 +12,14 @@
   {% for id, title, date, link, note, availability, seriesID in comic %}
     <div class="col-xs-6 col-md-2">
       <div class="thumbnail">
-        <a href="/series?id={{seriesID}}">
         <img src="static/covers/{{id}}.png" class="img-responsive" />
-        </a>
           <div class="caption">
             <h4>{{title}}</h4>
+            <div class="list-group">
+            <button type="button" id="myButton" desc="{{id}}" data-loading-text="Loading..." class="list-group-item list-group-item-danger">
+           Un-buy 
+          </button>
+          </div>
         </div>
       </div>
     </div>
