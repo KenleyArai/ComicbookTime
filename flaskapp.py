@@ -142,7 +142,6 @@ def marvel_update():
 # Pages with views
 @app.route('/')
 def index():
-    init_thread()
     login = get_login()
     return check_login(login, main.main)
 
@@ -167,24 +166,7 @@ def shutdown_session(exception=None):
 
 # Sockets
 
-def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    while True:
-        time.sleep(10)
-        count += 1
-        socketio.emit('my response',
-                      {'data': 'Server generated event', 'count': count},
-                      namespace='/test')
-
-def init_thread():
-    global thread
-    if thread is None:
-        thread = Thread(target=background_thread)
-        thread.daemon = True
-        thread.start()
-
-@socketio.on('unbuy', namespace='/test')
+@socketio.on('unbuy')
 def test_message(message):
     c_id = message['data']
     login = get_login()
@@ -197,7 +179,7 @@ def test_message(message):
     user.comic_child.remove(comic)                                  # Updating the bought relation
     db_session.commit()
 
-@socketio.on('disconnect', namespace='/test')
+@socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected', request.sid)
 
