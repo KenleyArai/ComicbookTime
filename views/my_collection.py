@@ -3,9 +3,9 @@ parentdir = os.path.dirname(__file__)
 sys.path.insert(0,parentdir)
 
 from flask import redirect,render_template,url_for
-from database import db_session
+from ..database import db_session
 
-from helper_functions import *
+from ..helper_functions import *
 
 def my_collection(login):
     user = get_user_by_uid(login['id']).one()
