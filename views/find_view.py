@@ -3,7 +3,7 @@ parentdir = os.path.dirname(__file__)
 sys.path.insert(0,parentdir)
 
 from flask import render_template
-from ..models import Comics
+from models import Comics
 from ..database import db_session
 from ..helper_functions import *
 
@@ -28,5 +28,5 @@ def find_view(login, request):
         return render_template('find.html',
                                found=comics,
                                login=login['given_name'] if login else None)
-    return render_template('find.html', None if not login else login['given_name'])
+    return render_template('find.html', login=None if not login else login['given_name'])
 
