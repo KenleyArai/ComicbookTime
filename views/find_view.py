@@ -1,6 +1,7 @@
-import sys
+import os,sys
+parentdir = os.path.dirname(__file__)
+sys.path.insert(0,parentdir)
 
-sys.path.append('../')
 from flask import render_template
 from models import Comics
 from database import db_session

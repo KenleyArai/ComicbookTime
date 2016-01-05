@@ -1,7 +1,6 @@
-
-import sys
-
-sys.path.append('../')
+import os,sys
+parentdir = os.path.dirname(__file__)
+sys.path.insert(0,parentdir)
 
 from flask import redirect,render_template,url_for
 from database import db_session
