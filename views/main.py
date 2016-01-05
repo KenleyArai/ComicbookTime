@@ -1,6 +1,6 @@
 from flask import render_template
-from ..models import User,Comics,has_sub
-from ..database import db_session
+from models import User,Comics,has_sub
+from database import db_session
 
 def main(login):
     """

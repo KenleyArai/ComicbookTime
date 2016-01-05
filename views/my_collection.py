@@ -1,7 +1,11 @@
-from flask import redirect,render_template,url_for
-from ..database import db_session
+import sys
 
-from ..helper_functions import *
+sys.path.append('../')
+
+from flask import redirect,render_template,url_for
+from database import db_session
+
+from helper_functions import *
 
 def my_collection(login):
     user = get_user_by_uid(login['id']).one()

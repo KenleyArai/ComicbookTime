@@ -56,7 +56,7 @@ def update_series(df):
                 db_session.commit()
 
 
-def download_kimage(url, comic_id):
+def download_image(url, comic_id):
     if not url or "no-image" in url:
         return None
     r = rq.get(url, stream=True)
@@ -65,7 +65,7 @@ def download_kimage(url, comic_id):
         r = rq.get(url, stream=True)
     path = "".join(['static/covers/', str(comic_id), '.png'])
 
-    with open(path, 'wb') as out_file:
+    with open(path, 'ab+') as out_file:
         shutil.copyfileobj(r.raw, out_file)
 
 

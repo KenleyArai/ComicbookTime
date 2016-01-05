@@ -1,7 +1,12 @@
+
+import sys
+
+sys.path.append('../')
+
 from flask import redirect,render_template,url_for
-from ..database import db_session
-from ..helper_functions import get_all_comics_by_series_id, get_tuple_rows, convet_comic_to_tuples
-from ..helper_functions import get_series_by_series_id, get_user_by_uid
+from database import db_session
+from helper_functions import get_all_comics_by_series_id, get_tuple_rows, convet_comic_to_tuples
+from helper_functions import get_series_by_series_id, get_user_by_uid
 
 def series_view(login, request):
     s_id = request.args.get('id')
