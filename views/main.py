@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append('../')
+
 from flask import render_template
 from models import User,Comics,has_sub
 from database import db_session
