@@ -37,19 +37,17 @@ class Comics(Base):
     id = Column(Integer, Sequence('comic_id_seq'), primary_key=True)
     title = Column(String)
     url   = Column(String)
-    notes = Column(String)
     release_date = Column(Date)
     image_link = Column(String)
-    availability = Column(Boolean)
     seriesID = Column(Integer, ForeignKey('series.id'))
 
     user_child = relationship('User', secondary=owns_comic, back_populates='comic_child')
 
     def get(self):
-        return (self.id, self.title,
-               self.release_date,
-               self.url,
-               self.notes,
-               self.release_date < datetime.date(datetime.now()),
-               self.seriesID)
+        return (self.id,
+                self.title,
+                self.release_date,
+                self.url,
+                self.release_date < datetime.date(datetime.now()),
+                self.seriesID)
 

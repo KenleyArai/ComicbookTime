@@ -136,7 +136,7 @@ def marvel_update():
     login = get_login()
     if login['given_name'] != "Kenley":
         return redirect(url_for('index'))
-    comic_tracking.update_marvel_database(marvel_urls)
+    comic_tracking.update_marvel_database()
     return redirect(url_for('index'))
 
 # Pages with views

@@ -10,8 +10,10 @@ import os.path
 import requests as rq
 import pandas as pd
 
+from sqlalchemy import Column, Boolean
 from sqlalchemy.sql import select
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup as bs
 from fuzzywuzzy import process
 from models import Comics, Series
@@ -30,30 +32,25 @@ def update_series(df):
         mask = "".join(["%", title,"%"])
         mask = Series.name.like(mask)
         s = select(columns).where(mask)
+
         result = [x[0] for x in db_session.execute(s).fetchall()]
 
+        comic_child = db_session.query(Comics).filter_by(title=data['title']).one()
         if not result:
-            comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
             new_series = Series(name=title, comic_child=[comic_child])
-
             db_session.add(new_series)
-            db_session.commit()
         else:
             options = process.extract(title, result)
             maximum = max(options, key=itemgetter(1))
 
             if maximum[1] < 85:
-                comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
                 new_series = Series(name=title, comic_child=[comic_child])
-
                 db_session.add(new_series)
-                db_session.commit()
             else:
-                comic_child = db_session.query(Comics).filter_by(title=data['title'])[0]
-                series = db_session.query(Series).filter_by(name=title)[0]
+                series = db_session.query(Series).filter_by(name=maximum[0]).first()
                 comic_child.seriesID = series.id
 
-                db_session.commit()
+        db_session.commit()
 
 
 def download_image(url, comic_id):
@@ -83,54 +80,62 @@ def get_image(url):
 
     return image_url
 
+def set_to_monday(d):
+    while d.weekday() != 0:
+        d = d - relativedelta(days=1)
+    return d
 
-def get_marvel_dataframe(url):
+def get_list_of_dates(base_url, start_date, end_date):
+    week_diff = (end_date - start_date).days//7
+    return [start_date + relativedelta(weeks=week) for week in xrange(week_diff)]
+
+def find_wednesday(d):
+    while d.weekday() != 3:
+        d = d - relativedelta(days=1)
+    return d
+
+
+def get_marvel_data_frame():
     marvel = []
-    headers = ["url", "title", "notes", "release_date", "image_link", "availability"]
+    images_links = {}
+
+    headers = ["title", "url", "release_date", "image_link"]
     comics = pd.DataFrame(columns=headers)
 
-    r = rq.get(url)
-    soup = bs(r.text, 'html.parser')
+    base_url = "http://marvel.com/comics/calendar/week/"
+    start_date = datetime.date(datetime.now())
 
-    paras = soup.findAll('p')
-    # Finding the date they are supposed to be listed
-    match = re.search(r'(\d{2}/\d{2}/\d{4})', soup.h1.string)
-    date = datetime.strptime(match.group(), '%m/%d/%Y').date()
-    availability = date < datetime.date(datetime.now())
+    start_date = set_to_monday(start_date)
+    end_date = start_date + relativedelta(months=3)
+    end_date = set_to_monday(end_date)
 
-    # Searching through each paragraph tag for the Marvel header
-    for paragraph in paras:
-        if paragraph.b and "MARVEL COMICS" == paragraph.b.u.string:
-            marvel = paragraph
+    dates = get_list_of_dates(base_url, start_date, end_date)
 
-    for a in marvel.findAll('a'):
-        if "Variant" not in a.string:
-            title = a.string.split("#")
-            if len(title) > 1:
-                title[0] = title[0] + "#" + title[1][0]
-                title[1] = title[1][1:]
-                s = select([Comics.title]).where(Comics.title == title[0])
-                result = db_session.execute(s).fetchone()
+    for date in dates:
+        url = "{}{}".format(base_url, date.strftime('%Y-%m-%d'))
+        soup = bs(rq.get(url).text, 'html.parser')
+        links = soup.findAll('a', {'class':'row-item-image-url'})
+        nearest_wednesday = find_wednesday(date)
 
-                if not result:
-                    new_row = []
-                    new_row.append(a['href'])
-                    new_row.append(title[0])
-                    new_row.append(title[1])
-                    new_row.append(date)
-                    new_row.append(get_image(a['href']))
-                    new_row.append(availability)
-                    comics.loc[len(comics)] = new_row
+        for link in links:
+            new_row = []
+            image_tag = link.find('img')
+
+            new_row.append(image_tag['title'])
+            new_row.append(url)
+            new_row.append(nearest_wednesday)
+            new_row.append(image_tag['src'].replace('portrait_incredible', 'detail'))
+
+            s = select([Comics.title]).where(Comics.title == image_tag['title'])
+            result = db_session.execute(s).fetchone()
+
+            if not result:
+                comics.loc[len(comics)] = new_row
 
     return comics
 
-def update_marvel_database(urls):
-    frames = []
-
-    for url in urls:
-        frames += [get_marvel_dataframe(url)]
-
-    without_dups = pd.concat(frames)
+def update_marvel_database():
+    without_dups = get_marvel_data_frame()
     without_dups.drop_duplicates(['title'], inplace=True)
     update_db(without_dups, TABLE)
 

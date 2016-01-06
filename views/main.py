@@ -41,4 +41,4 @@ def main(login):
         result = [c[n:n+3] for n in range(0, len(c), 3)] # Build helper function to do this
         return render_template('main.html', comics=result, login=login['given_name'])
     # Return the main page if there are no subscriptions
-    return render_template('main.html')
+    return render_template('main.html', login=login['given_name'] if login else None)

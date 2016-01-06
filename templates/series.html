@@ -5,7 +5,7 @@
 <a href="/series?id={{series_id}}&sub=1" class="btn btn-primary btn-lg btn-block">Subscribe</a>
 {% for x in found %}
   <div class="row">
-  {% for id, title, date, link, note, availability, seriesID in x %}
+  {% for id, title, date, link, availability, seriesID in x %}
     <div class="col-xs-6 col-md-4">
       <div class="thumbnail">
         <a href="/series?id={{seriesID}}">
@@ -20,7 +20,6 @@
             <li class="list-group-item list-group-item-danger">This comic is not available yet!</li>
             {% endif %}
             <li class="list-group-item list-group-item-info">Release Date: {{date}}</li>
-            <!--<p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>-->
         </div>
       </div>
     </div>

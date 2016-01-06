@@ -5,7 +5,7 @@
 
 {% for x in comics%}
   <div class="row">
-  {% for id, title, date, link, note, availability, seriesID in x %}
+  {% for id, title, date, link, availability, seriesID in x %}
     <div class="col-xs-6 col-md-4">
       <div class="thumbnail">
         <a href="/series?id={{seriesID}}">
