@@ -44,7 +44,7 @@ def get_list_of_dates(base_url, start_date, end_date):
     return [start_date + relativedelta(weeks=week) for week in xrange(week_diff)]
 
 def find_wednesday(d):
-    while d.weekday() != 3:
+    while d.weekday() != 2:
         d = d + relativedelta(days=1)
     return d
 
