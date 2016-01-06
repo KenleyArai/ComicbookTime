@@ -11,7 +11,7 @@ import requests as rq
 import pandas as pd
 
 from sqlalchemy import Column, Boolean
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, exists
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from bs4 import BeautifulSoup as bs
@@ -22,48 +22,6 @@ from operator import itemgetter
 from time import sleep
 
 TABLE = "comics"
-
-# In[115]:
-
-def update_series(df):
-    for index, data in df.iterrows():
-        title = data['title'][:-3]
-        columns = [Series.name]
-        mask = "".join(["%", title,"%"])
-        mask = Series.name.like(mask)
-        s = select(columns).where(mask)
-
-        result = [x[0] for x in db_session.execute(s).fetchall()]
-
-        comic_child = db_session.query(Comics).filter_by(title=data['title']).one()
-        if not result:
-            new_series = Series(name=title, comic_child=[comic_child])
-            db_session.add(new_series)
-        else:
-            options = process.extract(title, result)
-            maximum = max(options, key=itemgetter(1))
-
-            if maximum[1] < 85:
-                new_series = Series(name=title, comic_child=[comic_child])
-                db_session.add(new_series)
-            else:
-                series = db_session.query(Series).filter_by(name=maximum[0]).first()
-                comic_child.seriesID = series.id
-
-        db_session.commit()
-
-
-def download_image(url, comic_id):
-    if not url or "no-image" in url:
-        return None
-    r = rq.get(url, stream=True)
-    if r.status_code != 200:
-        sleep(30)
-        r = rq.get(url, stream=True)
-    path = "".join(['static/covers/', str(comic_id), '.png'])
-
-    with open(path, 'ab+') as out_file:
-        shutil.copyfileobj(r.raw, out_file)
 
 
 def get_image(url):
@@ -96,16 +54,14 @@ def find_wednesday(d):
 
 
 def get_marvel_data_frame():
-    marvel = []
-    images_links = {}
+    comics = []
 
-    headers = ["title", "url", "release_date", "image_link"]
-    comics = pd.DataFrame(columns=headers)
 
     base_url = "http://marvel.com/comics/calendar/week/"
     start_date = datetime.date(datetime.now())
-
+    start_date = start_date - relativedelta(months=4)
     start_date = set_to_monday(start_date)
+
     end_date = start_date + relativedelta(months=3)
     end_date = set_to_monday(end_date)
 
@@ -118,37 +74,68 @@ def get_marvel_data_frame():
         nearest_wednesday = find_wednesday(date)
 
         for link in links:
-            new_row = []
             image_tag = link.find('img')
-
-            new_row.append(image_tag['title'])
-            new_row.append(url)
-            new_row.append(nearest_wednesday)
-            new_row.append(image_tag['src'].replace('portrait_incredible', 'detail'))
-
             s = select([Comics.title]).where(Comics.title == image_tag['title'])
             result = db_session.execute(s).fetchone()
 
             if not result:
-                comics.loc[len(comics)] = new_row
-
+                img_link = image_tag['src'].replace('portrait_incredible', 'detail')
+                new_comic = Comics(title=image_tag['title'].encode("utf8"),
+                                   url=url.encode("utf8"),
+                                   release_date=nearest_wednesday,
+                                   image_link=img_link.encode("utf8"))
+                comics.append(new_comic)
     return comics
 
 def update_marvel_database():
-    without_dups = get_marvel_data_frame()
-    without_dups.drop_duplicates(['title'], inplace=True)
-    update_db(without_dups, TABLE)
+    new_comics = get_marvel_data_frame()
+    update_db(new_comics)
 
-def update_db(dataframe, table):
-    e = engine
+def update_db(comics):
+    for comic in comics:
+        if "Guide" in comic.title:
+            continue
+        query = db_session.query(Comics).filter_by(title=comic.title).all()
+        if not query:
+            db_session.add(comic)
+            find_series(comic)
+            download_image(comic)
+    db_session.commit()
 
-    if len(dataframe) != 0:
-        dataframe.to_sql(name=table, con=e, if_exists="append", index=False)
+def download_image(comic):
+    url = comic.image_link
 
-        for index, row in dataframe.iterrows():
-            s = select([Comics.id]).where(Comics.title == row['title'])
-            result = db_session.execute(s).fetchone()[0]
+    r = rq.get(url, stream=True)
+    if r.status_code != 200:
+        sleep(30)
+        r = rq.get(url, stream=True)
 
-            download_image(row['image_link'], result)
+    path = "{}{}{}".format("static/covers/",str(comic.id).encode("utf8"),".png")
 
-        update_series(dataframe)
+    with open(path, 'ab+') as out_file:
+        shutil.copyfileobj(r.raw, out_file)
+
+def find_series(comic):
+    series_title = comic.title[:-3]
+
+    like = "{percent}{title}{percent}".format(percent="%",title=series_title.encode("utf8"))
+    mask = Series.name.like(like)
+    s = select([Series.name]).where(mask)
+
+    result = [x[0] for x in db_session.execute(s).fetchall()]
+
+    if not result:
+        new_series = Series(name=series_title, comic_child=[comic])
+        db_session.add(new_series)
+    else:
+        options = process.extract(series_title, result)
+        maximum = max(options, key=itemgetter(1))
+
+        if maximum[1] < 85:
+            new_series = Series(name=series_title, comic_child=[comic])
+            db_session.add(new_series)
+        else:
+            series = db_session.query(Series).filter_by(name=maximum[0]).first()
+            comic.seriesID = series.id
+
+    db_session.commit()

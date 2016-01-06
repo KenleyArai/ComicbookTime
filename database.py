@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 engine = create_engine('sqlite://///Users/kenleyarai/Documents/dev/ComicbookTime/comics.db', echo=False)
 db_session = scoped_session(sessionmaker(autocommit=False,autoflush=False,bind=engine))
-
+engine.connect().connection.connection.text_factory = str
 Base = declarative_base()
 Base.query = db_session.query_property()
 
