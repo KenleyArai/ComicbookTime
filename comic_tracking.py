@@ -38,10 +38,6 @@ def get_image(url):
 
     return image_url
 
-def set_to_monday(d):
-    while d.weekday() != 0:
-        d = d - relativedelta(days=1)
-    return d
 
 def get_list_of_dates(base_url, start_date, end_date):
     week_diff = (end_date - start_date).days//7
@@ -49,21 +45,24 @@ def get_list_of_dates(base_url, start_date, end_date):
 
 def find_wednesday(d):
     while d.weekday() != 3:
-        d = d - relativedelta(days=1)
+        d = d + relativedelta(days=1)
     return d
 
+def find_sunday(d):
+    while d.weekday() != 6:
+        d = d - relativedelta(days=1)
+    return d
 
 def get_marvel_data_frame():
     comics = []
 
-
     base_url = "http://marvel.com/comics/calendar/week/"
-    start_date = datetime.date(datetime.now())
-    start_date = start_date - relativedelta(months=4)
-    start_date = set_to_monday(start_date)
+    current_date = datetime.date(datetime.now())
+    start_date = current_date - relativedelta(months=4)
+    start_date = find_sunday(start_date)
 
-    end_date = start_date + relativedelta(months=3)
-    end_date = set_to_monday(end_date)
+    end_date = current_date + relativedelta(months=4)
+    end_date = find_sunday(end_date)
 
     dates = get_list_of_dates(base_url, start_date, end_date)
 
