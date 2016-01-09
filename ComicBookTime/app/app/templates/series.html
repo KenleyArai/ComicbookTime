@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if found %}
+<a href="/series/sub/{{series_id}}" class="btn btn-primary btn-lg btn-block">Subscribe</a>
+{% for comics in found %}
+  <div class="row">
+  {% for comic in comics %}
+    <div class="col-xs-6 col-md-4">
+      <div class="thumbnail">
+        <img src="{{ url_for('static', filename='covers/') }}{{comic.id}}.png" class="img-responsive" />
+          <div class="caption">
+            <h4>{{comic.title}}</h4>
+            <ul class="list-group">
+            {% if comic.avail %}
+              <li class="list-group-item list-group-item-success">This comic is available!</li>
+            {% else %}
+            <li class="list-group-item list-group-item-danger">This comic is not available yet!</li>
+            {% endif %}
+            <li class="list-group-item list-group-item-info">Release Date: {{comic.release_date}}</li>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+{% endfor %}
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+{% if subs %}
+{% for series in subs%}
+<div class="jumbotron">
+  <div class="container">
+    <h2>{{ series.title }}</h2>
+  {% for c in series %}
+  <div class="row">
+    <div class="col-xs-6 col-md-2">
+      <div class="thumbnail">
+        <img src="static/covers/{{c.id}}.png" class="img-responsive" />
+          <div class="caption">
+            <h4>{{c.title}}</h4>
+            <button type="button" name="myButton{{c.id}}" id="myButton{{c.id}}" desc="{{c.id}}" data-loading-text="unbought" class="btn btn-primary" autocomplete="off">
+           Un-buy 
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+  </div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="jumbotron">
+  <h1>Try it out!<h1>
+    <p>Looks like you don't have anything in your collection yet!</p>
+</div>
+
+{% endif %}
+
+{% endblock %}
