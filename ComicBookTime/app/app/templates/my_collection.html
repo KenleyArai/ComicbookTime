@@ -3,13 +3,15 @@
 
 
 {% if subs %}
+
 {% for series in subs%}
 <div class="jumbotron">
   <div class="container">
     <h2>{{ series.title }}</h2>
-  {% for c in series %}
   <div class="row">
-    <div class="col-xs-6 col-md-2">
+
+    {% for c in series %}
+    <div class="col-xs-6 col-md-4">
       <div class="thumbnail">
         <img src="static/covers/{{c.id}}.png" class="img-responsive" />
           <div class="caption">
@@ -20,8 +22,9 @@
         </div>
       </div>
     </div>
+
+      {% endfor %}
   </div>
-{% endfor %}
 
   </div>
 </div>

@@ -1,6 +1,6 @@
 from flask import Blueprint,render_template,request,session,redirect,url_for
 from flask_security.core import current_user
-from app.models import Series, User
+from app.models import Series, User, Comic
 
 from flask.ext.security import login_required
 from app import user_datastore,db
@@ -11,7 +11,9 @@ def get_tuple_rows(l, columns):
 
 @series.route('/series/<int:series_id>')
 def series_page(series_id):
-    series_comics = Series.query.filter_by(id=series_id).all()
+    series_comics = Comic.query.filter_by(series_id=series_id).all()
+    
+    print(series_comics)
     series_comics = get_tuple_rows(series_comics, 3)
     return render_template('series.html', login=current_user.connections.full_name, found=series_comics, series_id=series_id)
 

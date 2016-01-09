@@ -12,13 +12,13 @@
 
 {% if found %}
 
-{% for comics in found %}
+{% for x in range(0,9,3)%}
+{% for comic in found.items[x:x+3] %}
   <div class="row">
-  {% for comic in comics %}
     <div class="col-xs-6 col-md-4">
       <div class="thumbnail">
         <a href="/series/{{comic.series_id}}">
-        <img src="static/covers/{{comic.id}}.png" class="img-responsive" />
+        <img src="{{ url_for('static', filename='covers/') }}{{comic.id}}.png" class="img-responsive" />
         </a>
           <div class="caption">
             <h4>{{comic.title}}</h4>
@@ -28,14 +28,36 @@
             {% else %}
             <li class="list-group-item list-group-item-danger">This comic is not available yet!</li>
             {% endif %}
-            <li class="list-group-item list-group-item-info">Release Date: {{comic.release_date}}</li>
+            <li class="list-group-item list-group-item-info">Release Date: {{comic.release_date.strftime("%d/%m/%y")}}</li>
         </div>
       </div>
     </div>
   {% endfor %}
   </div>
 {% endfor %}
-{% endif %}
+<nav>
+  <ul class="pagination pagination-lg">
+    {%if found.has_prev%}
+    <li>
+      <a href="{{ url_for('find.find_page', page=found.prev_num)  }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% endif %}
+    {% for i in range(found.next_num-1, found.next_num + 5) %}
+    <li><a href="/find/{{i}}">{{i}}</a></li>
+    {% endfor %}
 
+    {%if found.has_next%}
+    <li>
+      <a href="{{ url_for('find.find_page', page=found.next_num) }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+
+    {%endif%}
+  </ul>
+</nav>
+{% endif %}
 
 {% endblock %}

@@ -8,22 +8,25 @@ find = Blueprint('find', __name__)
 def get_tuple_rows(l, columns):
     return [l[n:n+columns] for n in range(0, len(l), columns)]
 
+
+
 @find.route('/find', methods=['GET','POST'])
-def find_page():
+@find.route('/find/<int:page>', methods=['GET','POST'])
+def find_page(page=1):
     comics=[]
+
+    search = ""
+
     if request.method == 'POST':
         search = request.form['comic']
+    bought = []
+    new_list = []
 
-        bought = []
-        new_list = []
-
-        like_condition = "".join(["%",search,"%"])
-        query = db.session.query(Comic).filter(Comic.title.like(like_condition)).all()
-
-        new_list = [x.get_dict() for x in query]
-        comics = get_tuple_rows(new_list, 3)
+    like_condition = "".join(["%",search,"%"])
+    query = Comic.query.filter(Comic.title.like(like_condition)).order_by(Comic.release_date)
+    pages = query.paginate(page,9, False)
 
     if not current_user.is_authenticated:
         return render_template('find.html',found=comics)
     else:
-        return render_template('find.html',found=comics,login=current_user.connections.full_name)
+        return render_template('find.html',found=pages,login=current_user.connections.full_name)
