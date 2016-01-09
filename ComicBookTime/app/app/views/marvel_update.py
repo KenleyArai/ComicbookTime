@@ -7,6 +7,5 @@ marvel_update = Blueprint('marvel_update', __name__)
 
 @marvel_update.route('/marvel_update')
 def marvel_update_page():
-    if session['name'] == "Kenley Arai":
-        comic_tracking.update_marvel_database(db)
+    comic_tracking.update_marvel_database(db)
     return redirect(url_for('index.index_page'))
