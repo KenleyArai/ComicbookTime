@@ -4,4 +4,3 @@ __pycache__/
 comics.db
 .ropeproject/
 static/covers/*
-global_var.py
