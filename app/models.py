@@ -91,7 +91,7 @@ class Comic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, unique=True)
     source_url = db.Column(db.String)
-    image_link = db.Column(db.String, unique=True)
+    image_link = db.Column(db.String)
     release_date = db.Column(db.DateTime)
     series_id = db.Column(db.Integer, db.ForeignKey('series.id'))
 
