@@ -10,13 +10,14 @@ def get_tuple_rows(l, columns):
 
 @index.route('/')
 @index.route('/index')
-def index_page():
+def index_page(page=1):
     if current_user.is_authenticated: 
-        follows = [x.comics.all() for x in current_user.follows_series]
-        follows = [x for sublist in follows for x in sublist]
+        series = current_user.follows_series
         bought = current_user.bought_comics
-        comics =[x.get_dict() for x in set(follows) - set(bought)]
-        comics = get_tuple_rows(comics, 3)
+
+        comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.desc())
+        comics = comics.paginate(page, 9, False)
+
         # Getting a list of bought comics
         return render_template('index.html', login=current_user.connections.full_name, comics=comics)
         # Return the main page if there are no subscriptions

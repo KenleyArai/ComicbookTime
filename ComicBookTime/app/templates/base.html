@@ -42,10 +42,11 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/">Home</a></li>
-            <li><a href="/find">Find</a></li>
+            <li><a href="/"><i class="fa fa-home fa-2x"></i></a></li>
+            <li><a href="/find"><i class="fa fa-search fa-2x"></i></a></li>
           {% if login %}
-            <li><a href="/my_collection">My Collection</a></li>
+            <li><a href="/my_collection">
+                <i class="fa fa-bookmark fa-2x"></i></a></li>
           {% endif %}
           {% if login == "Kenley" %}
             <li><a href="/marvel_update">Update Marvel Database</a></li>
@@ -95,6 +96,16 @@
               var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
               var $comic_id = this.getAttribute('desc')
               socket.emit('unbuy', {data: $comic_id});
+              socket.emit('disconnect request');
+              return false;
+            });
+
+            $('a.buy').on('click', function(){
+              var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+              var $comic_id = this.getAttribute('desc')
+              $(this).text('Added to collection')
+              $(this).toggleClass("disabled");
+              socket.emit('buy', {data: $comic_id});
               socket.emit('disconnect request');
               return false;
             });

@@ -1,6 +1,5 @@
 from app import db
 from flask.ext.security import UserMixin, RoleMixin
-
 from datetime import datetime
 
 # Defining the table for the many-many relationship of User and Comic
@@ -102,12 +101,14 @@ class Comic(db.Model):
         self.image_link = image_link
         self.release_date = release_date
 
+    def is_avail(self):
+        return self.release_date < datetime.now()
+
     def get_dict(self):
         return {'id':self.id,
                 'title':self.title,
                 'source_url':self.source_url,
                 'image_link':self.image_link,
-                'avail':self.release_date < datetime.now(),
                 'release_date':datetime.date(self.release_date),
                 'series_id':self.series_id}
 

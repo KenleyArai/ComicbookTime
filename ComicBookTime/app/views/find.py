@@ -5,11 +5,6 @@ from app import db
 
 find = Blueprint('find', __name__)
 
-def get_tuple_rows(l, columns):
-    return [l[n:n+columns] for n in range(0, len(l), columns)]
-
-
-
 @find.route('/find', methods=['GET','POST'])
 @find.route('/find/<int:page>', methods=['GET','POST'])
 def find_page(page=1):
@@ -23,10 +18,10 @@ def find_page(page=1):
     new_list = []
 
     like_condition = "".join(["%",search,"%"])
-    query = Comic.query.filter(Comic.title.like(like_condition)).order_by(Comic.release_date)
+    query = Comic.query.filter(Comic.title.like(like_condition)).order_by(Comic.release_date.desc())
     pages = query.paginate(page,9, False)
 
     if not current_user.is_authenticated:
-        return render_template('find.html',found=comics)
+        return render_template('find.html',found=pages)
     else:
         return render_template('find.html',found=pages,login=current_user.connections.full_name)
