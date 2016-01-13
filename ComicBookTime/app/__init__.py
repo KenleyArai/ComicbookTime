@@ -10,8 +10,10 @@ from flask.ext.security import Security, SQLAlchemyUserDatastore, \
     UserMixin, RoleMixin, login_required,login_user
 from flask_security.core import current_user
 from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask.ext.heroku import Heroku
 
 app = Flask(__name__)
+heroku = Heroku()
 
 db = SQLAlchemy(app)
 from app.models import User, Role, Connection, Comic
@@ -20,7 +22,7 @@ from app.models import User, Role, Connection, Comic
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
-
+heroku.init_app(app)
 from views.index import index
 from views.find import find
 from views.my_collection import my_collection
@@ -36,14 +38,6 @@ app.register_blueprint(series)
 app.register_blueprint(auth)
 app.register_blueprint(marvel_update)
 app.register_blueprint(bought)
-
-@app.before_first_request
-def do_this():
-    if not Role.query.first():
-        db.create_all()
-        user_datastore.create_role(name="admin",description="")
-        user_datastore.create_role(name="user",description="")
-        db.session.commit()
 
 async_mode = None
 
