@@ -12,8 +12,14 @@ from flask_security.core import current_user
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask.ext.heroku import Heroku
 
+import os
+
 app = Flask(__name__)
-app.config.from_object('config')
+
+
+app.config['DEBUG'] = True
+app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_DATABASE_URI' = os.environ["DATABASE_URL"]
 
 heroku = Heroku()
 
