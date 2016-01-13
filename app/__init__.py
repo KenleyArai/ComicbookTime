@@ -13,6 +13,9 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask.ext.heroku import Heroku
 
 app = Flask(__name__)
+app.config.from_object('config')
+app.config.from_pyfile('config.py')
+
 heroku = Heroku()
 
 db = SQLAlchemy(app)
