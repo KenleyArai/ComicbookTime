@@ -68,6 +68,13 @@ elif async_mode == 'gevent':
     monkey.patch_all()
 
 socketio = SocketIO(app, async_mode=async_mode)
+@app.before_first_request
+def do_this():
+    if not Role.query.first():
+        db.create_all()
+        user_datastore.create_role(name="admin",description="")
+        user_datastore.create_role(name="user",description="")
+        db.session.commit()
 
 @socketio.on('buy')
 def buy(message):
