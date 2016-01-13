@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if found %}
+
+{% from "macros.html" import print_rows %}
+<a href="/series/sub/{{series_id}}" class="btn btn-primary btn-lg btn-block">Subscribe</a>
+
+{{ print_rows(found, 3, 3)  }}
+
+{% endif %}
+
+
+{% endblock %}
