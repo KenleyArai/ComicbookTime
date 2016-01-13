@@ -1,1 +1,1 @@
-web: python ComicBookTime/run.py
+web: python run.py
