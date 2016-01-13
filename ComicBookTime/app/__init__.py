@@ -11,9 +11,7 @@ from flask.ext.security import Security, SQLAlchemyUserDatastore, \
 from flask_security.core import current_user
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
-app = Flask(__name__, instance_relative_config=True)
-app.config.from_object('config')
-app.config.from_pyfile('config.py')
+app = Flask(__name__)
 
 db = SQLAlchemy(app)
 from app.models import User, Role, Connection, Comic
