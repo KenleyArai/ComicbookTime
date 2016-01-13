@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['SQLALCHEMY_DATABASE_URI' = os.environ["DATABASE_URL"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 heroku = Heroku()
 
