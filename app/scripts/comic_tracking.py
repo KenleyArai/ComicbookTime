@@ -3,6 +3,7 @@
 
 # In[131]:
 import re
+import boto3
 import shutil
 import os.path
 import requests as rq
@@ -14,7 +15,8 @@ from fuzzywuzzy import process
 from operator import itemgetter
 from time import sleep
 from app.models import Comic, Series
-
+from PIL import Image
+from StringIO import StringIO
 TABLE = "comic"
 
 def get_list_of_dates(base_url, start_date, end_date):
@@ -80,17 +82,15 @@ def update_db(comics,db):
     db.session.commit()
 
 def download_image(comic):
+    filename = "{}.{}".format(comic.id, "jpg")
+    conn = boto3.resource('s3')
+    
     url = comic.image_link
+    r = rq.get(url)
 
-    r = rq.get(url, stream=True)
-    if r.status_code != 200:
-        sleep(30)
-        r = rq.get(url, stream=True)
-
-    path = "{}{}{}".format("app/static/covers/",str(comic.id).encode("utf8"),".png")
-
-    with open(path, 'ab+') as out_file:
-        shutil.copyfileobj(r.raw, out_file)
+    with Image.open(StringIO(r.content)) as img:
+        img.save(filename, 'JPEG') 
+        conn.Object('comicbooktime', filename).put(Body=open(filename, 'rb'))
 
 def find_series(comic,db):
     series_title = comic.title[:-3]

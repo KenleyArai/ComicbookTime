@@ -3,7 +3,7 @@
 <div class="col-comic.-6 col-md-4">
   <div class="thumbnail">
     <a href="/series/{{comic.series_id}}">
-    <img src="{{ url_for('static', filename='covers/') }}{{comic.id}}.png" class="img-responsive" />
+    <img src="https://s3-us-west-1.amazonaws.com/comicbooktime/{{comic.id}}.jpg" class="img-responsive" />
     </a>
       <div class="caption">
         <h4>{{comic.title}}</h4>
