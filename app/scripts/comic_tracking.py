@@ -49,21 +49,27 @@ def get_marvel_list(db):
     for date in dates:
         url = "{}{}".format(base_url, date.strftime('%Y-%m-%d'))
         soup = bs(rq.get(url).text, 'html.parser')
-        links = soup.findAll('a', {'class':'row-item-image-url'})
+        links = soup.findAll('div', {'class':'row-item comic-item'})
         nearest_wednesday = find_wednesday(date)
 
         for link in links:
             image_tag = link.find('img')
-            s = select([Comic.title]).where(Comic.title == image_tag['title'])
-            result = db.session.execute(s).fetchone()
+            creator_tag = link.find('p', {'class':'meta-creators'})
+            creators = None
+
+            if creator_tag:
+                creators = [x.text for x in creator_tag.findAll('a')]
+
+            result = Comic.query.filter_by(title=image_tag['title']).one()
 
             if not result:
                 img_link = image_tag['src'].replace('portrait_incredible', 'detail')
-                new_comic = Comic(title=image_tag['title'].encode("utf8"),
+                new_comic = Comic(title=image_tag['title'],
                                      source_url=url,
                                      release_date=nearest_wednesday,
                                      image_link=img_link)
                 comics.append(new_comic)
+
     return comics
 
 def update_marvel_database(db):
@@ -92,12 +98,13 @@ def download_image(comic):
         img.save(filename, 'JPEG') 
         conn.Object('comicbooktime', filename).put(Body=open(filename, 'rb'))
 
-def find_series(c,db):
-    series_title = c.title[:-4]
-    print(series_title)
+def find_series(comic,db):
+    series_title = comic.title[:-4]
+
     like = "{percent}{title}{percent}".format(percent="%",title=series_title)
-    result = Series.query.filter(Series.title.like(like)).all()
-    print(result)
+    query = Series.query.filter(Series.title.like(like)).all()
+
+    result = [x.title for x in query]
 
     if not result:
         new_series = Series(title=series_title, comics=[comic])
@@ -110,5 +117,7 @@ def find_series(c,db):
             new_series = Series(title=series_title, comics=[comic])
             db.session.add(new_series)
         else:
-            comic.seriesID = result.id
+
+            series = Series.query.filter_by(title=maximum[0]).one()
+            comic.series_id = series.id
     db.session.commit()

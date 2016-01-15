@@ -12,6 +12,12 @@ follows_series = db.Table('follows',
                          db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
                          db.Column('series_id', db.Integer, db.ForeignKey('series.id')),
                           )
+
+created = db.Table('created_comic',
+                        db.Column('creator_id', db.Integer, db.ForeignKey('creator.id')),
+                        db.Column('comic_id', db.Integer, db.ForeignKey('comic.id')),
+                        )
+
 # Define models
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
@@ -114,3 +120,13 @@ class Comic(db.Model):
     def __repr__(self):
         data = self.get_dict()
         return "<Title:{title}><Source Url:{source_url}><Image Link:{image_link}><Release Date:{release_date}>".format(**data)
+
+class Creator(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+
+    created_comics = db.relationship('Comic',
+                                    secondary=created,
+                                    backref=db.backref('creator', lazy='dynamic'))
+
+
