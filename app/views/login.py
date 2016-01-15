@@ -12,8 +12,6 @@ from app.models import User,Role
 
 import json
 
-REDIRECT_URI = '/oauth2callback'
-
 auth = Blueprint('auth', __name__)
 
 @auth.route('/logout')
@@ -21,8 +19,6 @@ def logout():
     session.clear()
     logout_user()
     return render_template('index.html')
-
-
 
 @login_failed.connect_via(app)
 def on_login_failed(sender, provider, oauth_response):

@@ -29,7 +29,7 @@ app.config['SOCIAL_GOOGLE'] = {
 
 app.secret_key = os.environ['SECRET']
 
-SECURITY_LOGIN_URL = "/none"
+app.config['SECURITY_LOGIN_URL'] = "/none"
 
 heroku = Heroku()
 
