@@ -18,7 +18,7 @@
         {% else %}
         <li class="list-group-item list-group-item-danger">This comic is not available yet!</li>
         {% endif %}
-        <li class="list-group-item list-group-item-info">Release Date: {{comic.release_date.strftime("%d/%m/%y")}}</li>
+        <li class="list-group-item list-group-item-info">Release Date: {{comic.release_date.strftime("%B %d %Y")}}</li>
     </div>
   </div>
 </div>
@@ -44,8 +44,11 @@
         </a>
       </li>
       {% endif %}
+
       {% for i in range(pages.next_num-1, pages.next_num + 5) %}
-      <li><a href="{{ url_for(request.url_rule.endpoint) }}/{{i}}">{{i}}</a></li>
+      {% if i < pages.pages %}
+        <li><a href="{{ url_for(request.url_rule.endpoint) }}/{{i}}">{{i}}</a></li>
+      {% endif %}
       {% endfor %}
 
       {%if pages.has_next%}
