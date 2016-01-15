@@ -29,6 +29,8 @@ app.config['SOCIAL_GOOGLE'] = {
 
 app.secret_key = os.environ['SECRET']
 
+SECURITY_LOGIN_URL = "/none"
+
 heroku = Heroku()
 
 db = SQLAlchemy(app)
