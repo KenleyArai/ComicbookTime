@@ -11,7 +11,7 @@ def get_tuple_rows(l, columns):
 @index.route('/')
 @index.route('/<int:page>')
 @index.route('/index')
-@index.route('/<int:page>')
+@index.route('/index/<int:page>')
 def index_page(page=1):
     if current_user.is_authenticated: 
         series = current_user.follows_series
