@@ -57,6 +57,21 @@ app.register_blueprint(auth)
 app.register_blueprint(marvel_update)
 app.register_blueprint(bought)
 
+
+@login_failed.connect_via(app)
+def on_login_failed(sender, provider, oauth_response):
+    connection_values = get_connection_values_from_oauth_response(provider, oauth_response)
+    connection_values['display_name'] = connection_values['display_name']['givenName'] +" "+ connection_values['display_name']['familyName']
+    connection_values['full_name'] = connection_values['display_name']
+    session['google_id'] = connection_values['provider_user_id']
+    user = user_datastore.create_user(google_id=session['google_id'])
+    user_datastore.commit()
+    connection_values['user_id'] = user.id
+    connect_handler(connection_values, provider)
+    login_user(user)
+    db.session.commit()
+    return render_template('index.html')
+
 async_mode = None
 
 if async_mode is None:
