@@ -92,11 +92,12 @@ def download_image(comic):
         img.save(filename, 'JPEG') 
         conn.Object('comicbooktime', filename).put(Body=open(filename, 'rb'))
 
-def find_series(comic,db):
-    series_title = comic.title[:-4]
+def find_series(c,db):
+    series_title = c.title[:-4]
     print(series_title)
     like = "{percent}{title}{percent}".format(percent="%",title=series_title)
     result = Series.query.filter(Series.title.like(like)).all()
+    print(result)
 
     if not result:
         new_series = Series(title=series_title, comics=[comic])

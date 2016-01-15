@@ -73,7 +73,6 @@ class Connection(db.Model):
     profile_url = db.Column(db.String(512))
     image_url = db.Column(db.String(512))
     rank = db.Column(db.Integer)
-    
 
 class Series(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -85,7 +84,7 @@ class Series(db.Model):
         self.comics = comics
 
     def __repr__(self):
-        return "<Title {}>".format(self.title)
+        return "{}".format(self.title)
 
 class Comic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
