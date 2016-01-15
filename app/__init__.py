@@ -22,7 +22,7 @@ app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 
-SOCIAL_GOOGLE = {
+app.config['SOCIAL_GOOGLE'] = {
                 'consumer_key':os.environ['GOOGLE_ID'],
                 'consumer_secret':os.environ['GOOGLE_SECRET']
                 }
