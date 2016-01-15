@@ -93,13 +93,9 @@ def download_image(comic):
         conn.Object('comicbooktime', filename).put(Body=open(filename, 'rb'))
 
 def find_series(comic,db):
-    series_title = comic.title[:-3]
-
-    like = "{percent}{title}{percent}".format(percent="%",title=series_title.encode("utf8"))
-    mask = Series.title.like(like)
-    s = select([Series.title]).where(mask)
-
-    result = [x[0] for x in db.session.execute(s).fetchall()]
+    series_title = comic.title[:-4]
+    like = "{percent}{title}{percent}".format(percent="%",title=series_title)
+    result = Series.query.filter(Series.title.like(like)).all()
 
     if not result:
         new_series = Series(title=series_title, comics=[comic])
@@ -112,7 +108,5 @@ def find_series(comic,db):
             new_series = Series(title=series_title, comics=[comic])
             db.session.add(new_series)
         else:
-            series = db.session.query(Series).filter_by(title=maximum[0]).first()
-            comic.seriesID = series.id
-
+            comic.seriesID = result.id
     db.session.commit()
