@@ -19,7 +19,7 @@ app = Flask(__name__)
 
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_ECHO'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] ='postgres://exiaxcdpbsccww:9BwXU6fe3cCngtw4qFoJCd64t9@ec2-54-83-52-144.compute-1.amazonaws.com:5432/d6j9lmua11fhv8'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 heroku = Heroku()
 
