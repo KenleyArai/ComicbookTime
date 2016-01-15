@@ -45,7 +45,7 @@
       </li>
       {% endif %}
       {% for i in range(pages.next_num-1, pages.next_num + 5) %}
-      <li><a href="/find/{{i}}">{{i}}</a></li>
+      <li><a href="{{ url_for(request.url_rule.endpoint) }}/{{i}}">{{i}}</a></li>
       {% endfor %}
 
       {%if pages.has_next%}

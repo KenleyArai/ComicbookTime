@@ -9,7 +9,9 @@ def get_tuple_rows(l, columns):
     return [l[n:n+columns] for n in range(0, len(l), columns)]
 
 @index.route('/')
+@index.route('/<int:page>')
 @index.route('/index')
+@index.route('/<int:page>')
 def index_page(page=1):
     if current_user.is_authenticated: 
         series = current_user.follows_series
