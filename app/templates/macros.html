@@ -39,7 +39,7 @@
     <ul class="pagination pagination-lg">
       {%if pages.has_prev%}
       <li>
-        <a href="{{ url_for('find.find_page', page=pages.prev_num)  }}" aria-label="Previous">
+        <a href="{{ url_for(request.url_rule.endpoint, page=pages.prev_num)  }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
@@ -50,7 +50,7 @@
 
       {%if pages.has_next%}
       <li>
-        <a href="{{ url_for('find.find_page', page=pages.next_num) }}" aria-label="Next">
+        <a href="{{ url_for(request.url_rule.endpoint, page=pages.next_num) }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
