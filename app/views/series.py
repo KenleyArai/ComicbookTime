@@ -12,8 +12,9 @@ def series_page(series_id):
     comics = Comic.query.filter_by(series_id=series_id)
     comics = comics.paginate(1, 9, False)
 
-    return render_template('series.html', login=current_user.connections.full_name, found=comics, series_id=series_id)
-
+    if current_user.is_authenticated:
+        return render_template('series.html', login=current_user.connections.full_name, found=comics, series_id=series_id)
+    return render_template('series.html', found=comics, series_id=series_id)
 
 @series.route('/series/sub/<int:series_id>')
 @login_required
