@@ -27,7 +27,7 @@ app.config['SOCIAL_GOOGLE'] = {
                 'consumer_secret':os.environ['GOOGLE_SECRET']
                 }
 
-app.config['SECRET'] = os.environ['SECRET']
+app.secret_key = os.environ['SECRET']
 
 heroku = Heroku()
 
