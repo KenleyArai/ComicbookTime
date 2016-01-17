@@ -35,7 +35,8 @@ class User(db.Model):
     # many to many: A user can have many comics
     bought_comics = db.relationship('Comic',
                                     secondary=bought_comics,
-                                    backref=db.backref('users', lazy='dynamic'))
+                                    backref=db.backref('users', lazy='dynamic'),
+                                    order_by='Comic.series_id')
 
     follows_series = db.relationship('Series',
                                      secondary=follows_series,

@@ -12,7 +12,6 @@ def my_collection_page():
     uniquekeys = []
 
     for k, g in groupby(bought, lambda x: x.series_id):
-       groups.append(list(g))    # Store group iterator as a list
-       uniquekeys.append(k)
+       groups.append(list(g))
 
     return render_template('my_collection.html', subs=groups, login=current_user.connections.full_name)
