@@ -1,19 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-{% if subs %}
-
-  {% from "macros.html" import print_rows, get_page_nav%}
-  
-  {% for bought in subs %}
-  <div class="jumbotron">
-    {{ print_rows(bought,3,3) }}
-  </div>
-  {% endfor %}
-  
-{% endif %}
-
 {% if subs %}
 
 {% for series in subs%}
