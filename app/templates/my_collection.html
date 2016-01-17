@@ -6,13 +6,10 @@
 {% for series in subs%}
 <div class="jumbotron">
   <div class="container">
-    <h2>{{ series.title }}</h2>
   <div class="row">
-
     {% for c in series %}
     <div class="col-xs-6 col-md-4">
       <div class="thumbnail">
-
       <img src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{c.id}}.jpg" class="img-responsive" />
           <div class="caption">
             <h4>{{c.title}}</h4>
