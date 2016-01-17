@@ -1,4 +1,5 @@
 from flask import Blueprint,render_template,session
+from itertools import groupby
 from app.models import User
 from flask_security.core import current_user
 my_collection = Blueprint('my_collection', __name__)
