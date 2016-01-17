@@ -17,7 +17,7 @@ import os
 app = Flask(__name__)
 
 
-app.config['DEBUG'] = True
+app.config['DEBUG'] = os.environ("DEBUG") 
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
