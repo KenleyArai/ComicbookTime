@@ -12,7 +12,7 @@ def series_page(series_id):
     comics = Comic.query.filter_by(series_id=series_id)
     comics = comics.paginate(1, 9, False)
     
-    subs = current_user.follows_series.all()
+    subs = current_user.follows_series
     is_sub = False
     for sub in subs:
         if series_id == sub.id:
