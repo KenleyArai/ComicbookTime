@@ -35,8 +35,7 @@ def series_page_sub(series_id):
 @login_required
 def series_page_unsub(series_id):
     series_comics = Series.query.filter_by(id=series_id).one()
-    if series_comics not in current_user.follows_series:
-        current_user.follows_series.remove(series_comics)
-        db.session.commit()
+    current_user.follows_series.remove(series_comics)
+    db.session.commit()
 
     return redirect(url_for('series.series_page', series_id=series_id))
