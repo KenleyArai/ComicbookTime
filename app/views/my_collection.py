@@ -6,6 +6,12 @@ my_collection = Blueprint('my_collection', __name__)
 @my_collection.route('/my_collection')
 def my_collection_page():
     bought = current_user.bought_comics
-    for i in bought:
-        print i
-    return render_template('my_collection.html', subs=bought, login=current_user.connections.full_name)
+    
+    groups = []
+    uniquekeys = []
+
+    for k, g in groupby(bought, lambda x: x.series_id):
+       groups.append(list(g))    # Store group iterator as a list
+       uniquekeys.append(k)
+
+    return render_template('my_collection.html', subs=groups, login=current_user.connections.full_name)
