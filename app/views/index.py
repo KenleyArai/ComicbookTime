@@ -5,9 +5,6 @@ from app import db
 
 index = Blueprint('index', __name__)
 
-def get_tuple_rows(l, columns):
-    return [l[n:n+columns] for n in range(0, len(l), columns)]
-
 @index.route('/')
 @index.route('/<int:page>')
 @index.route('/index')
