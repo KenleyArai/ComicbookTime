@@ -1,5 +1,5 @@
 from flask import Blueprint,render_template,session
-from flask.ext.mobility.decorators import mobilized
+from flask.ext.mobility.decorators import mobile_template
 from app.models import bought_comics,Comic,User
 from flask_security.core import current_user
 from app import db
@@ -10,7 +10,8 @@ index = Blueprint('index', __name__)
 @index.route('/<int:page>')
 @index.route('/index')
 @index.route('/index/<int:page>')
-def index_page(page=1):
+@mobile_template('{mobile/}index.html')
+def index_page(template="index.html",page=1):
     if current_user.is_authenticated: 
         series = current_user.follows_series
         bought = current_user.bought_comics
@@ -19,10 +20,7 @@ def index_page(page=1):
         comics = comics.paginate(page, 9, False)
 
         # Getting a list of bought comics
-        return render_template('index.html', login=current_user.connections.full_name, comics=comics)
+        return render_template(template, login=current_user.connections.full_name, comics=comics)
         # Return the main page if there are no subscriptions
-    return render_template('index.html') 
+    return render_template(template) 
 
-@mobilized(index_page)
-def index_page(page=1):
-    return "Hello World!"

@@ -11,6 +11,7 @@ from flask.ext.security import Security, SQLAlchemyUserDatastore, \
 from flask_security.core import current_user
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask.ext.heroku import Heroku
+from flask.ext.mobility import Mobility
 
 import os
 
@@ -33,6 +34,7 @@ app.config['SECURITY_LOGIN_URL'] = "/none"
 
 heroku = Heroku()
 
+Mobility(app)
 db = SQLAlchemy(app)
 from app.models import User, Role, Connection, Comic
 
