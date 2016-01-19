@@ -33,6 +33,7 @@
 {% endmacro %}
 
 {% macro get_page_nav(pages) %}
+  {% if pages.page > 1 %}
   <nav>
     <ul class="pagination pagination-lg">
       {%if pages.has_prev%}
@@ -59,4 +60,5 @@
       {%endif%}
     </ul>
   </nav>
+  {% endif %}
 {% endmacro %}

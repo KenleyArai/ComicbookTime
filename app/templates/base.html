@@ -115,11 +115,11 @@
                     $overlay.append("<h2></h2><p><a class='unbuy info' desc=" + this + "><i class='fa fa-times fa-5x'></i></a>");
                     $div.append($hover.append($img).append($overlay));
 
-                    $('#imagesList').append($div)
+                    $('#imagesList').append($div);
                   });
                   $('#imagemodal').modal('show');   
 
-            $('a.unbuy').on('click', function () {
+            $('a.unbuy.info').on('click', function () {
               var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
               var $comic_id = this.getAttribute('desc')
               $('img#' + $comic_id).remove()
