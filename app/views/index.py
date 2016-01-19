@@ -14,7 +14,7 @@ def index_page(page=1):
         series = current_user.follows_series
         bought = current_user.bought_comics
 
-        comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.desc())
+        comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.asc())
         comics = comics.paginate(page, 9, False)
 
         # Getting a list of bought comics
