@@ -31,7 +31,7 @@
     </div>
   {% endfor %}
 {% endmacro %}
-
+f not comic.is_avail()
 {% macro print_mobile(comics) %}
 <table class="table">
   <thead>
@@ -43,6 +43,7 @@
     </thead>
     <tbody>
     {% for comic in comics.items %}
+    <tr {% if not comic.is_avail() %}class="success"{%else%} class="danger" {% endif %}>
       <td>
         <img src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{comic.id}}.jpg" class="{% if not comic.is_avail() %}not-avail{% endif %}  img-responsive">
       </td>
@@ -52,6 +53,7 @@
       <td>
         <a class=info href="/series/{{comic.series_id}}">{{comic.release_date.strftime("%B %d %Y")}}</a>
       </td>
+      </tr>
     {% endfor%}
     </tbody>
   </table>
