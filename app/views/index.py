@@ -1,4 +1,5 @@
 from flask import Blueprint,render_template,session
+from flask.ext.mobility.decorators import mobilized
 from app.models import bought_comics,Comic,User
 from flask_security.core import current_user
 from app import db
@@ -21,3 +22,7 @@ def index_page(page=1):
         return render_template('index.html', login=current_user.connections.full_name, comics=comics)
         # Return the main page if there are no subscriptions
     return render_template('index.html') 
+
+@mobilized(index_page)
+def index_page(page=1):
+    return "Hello World!"
