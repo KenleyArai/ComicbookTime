@@ -2,9 +2,9 @@
 {% block content %}
 
 {% if comics %}
-{% from "macros.html" import print_rows,get_page_nav %}
+{% from "macros.html" import print_mobile,get_page_nav %}
 
-{{ print_rows(comics, 3, 3, login)  }}
+{{ print_mobile(comics)  }}
 {{ get_page_nav(comics)  }}
 {% else %}
 <div class="jumbotron">

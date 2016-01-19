@@ -32,6 +32,31 @@
   {% endfor %}
 {% endmacro %}
 
+{% macro print_mobile(comics) %}
+<table class="table">
+  <thead>
+      <tr>
+        <th>Cover</th>
+        <th>Title</th>
+        <th>Release Date</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for comic in comics %}
+      <td>
+        <img src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{comic.id}}.jpg" class="{% if not comic.is_avail() %}not-avail{% endif %}  img-responsive">
+      </td>
+      <td>
+        {{comic.title}}
+      </td>
+      <td>
+        <a class=info href="/series/{{comic.series_id}}">{{comic.release_date.strftime("%B %d %Y")}}</a>
+      </td>
+    {% endfor%}
+    </tbody>
+  </table>
+{% endmacro %}
+
 {% macro get_page_nav(pages) %}
   {% if pages.pages > 1 %}
   <nav>
