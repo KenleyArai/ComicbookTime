@@ -1,5 +1,5 @@
 from app import db
-from flask.ext.security import UserMixin, RoleMixin
+from flask.ext.security import RoleMixin
 from datetime import datetime
 
 # Defining the table for the many-many relationship of User and Comic
@@ -46,8 +46,10 @@ class User(db.Model):
                             secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     connections = db.relationship('Connection',
-                                  backref=db.backref('user', lazy='joined'), cascade="all", uselist=False)
+                                  backref=db.backref('user', lazy='joined'),
+                                  cascade="all", uselist=False)
     active = False
+
     def is_active(self):
         return True
 
@@ -60,13 +62,14 @@ class User(db.Model):
     def is_anonymous(self):
         return False
 
-    def __init__(self,google_id,active,roles):
+    def __init__(self, google_id, active, roles):
         self.google_id = google_id
         self.active = active
         self.roles = roles
 
     def __repr__(self):
         return "<Google ID {}>".format(self.google_id)
+
 
 class Connection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -81,6 +84,7 @@ class Connection(db.Model):
     image_url = db.Column(db.String(512))
     rank = db.Column(db.Integer)
 
+
 class Series(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String, unique=True)
@@ -92,6 +96,7 @@ class Series(db.Model):
 
     def __repr__(self):
         return "{}".format(self.title)
+
 
 class Comic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -111,12 +116,12 @@ class Comic(db.Model):
         return self.release_date < datetime.now()
 
     def get_dict(self):
-        return {'id':self.id,
-                'title':self.title,
-                'source_url':self.source_url,
-                'image_link':self.image_link,
-                'release_date':datetime.date(self.release_date),
-                'series_id':self.series_id}
+        return {'id': self.id,
+                'title': self.title,
+                'source_url': self.source_url,
+                'image_link': self.image_link,
+                'release_date': datetime.date(self.release_date),
+                'series_id': self.series_id}
 
     def __repr__(self):
         data = self.get_dict()
@@ -129,5 +134,3 @@ class Creator(db.Model):
     created_comics = db.relationship('Comic',
                                     secondary=created,
                                     backref=db.backref('creator', lazy='dynamic'))
-
-

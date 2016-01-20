@@ -1,15 +1,12 @@
-from flask import Flask,render_template,session,request
+from flask import Flask, render_template, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask.ext.social import Social, login_failed
 from flask.ext.social.views import connect_handler
 from flask.ext.social.utils import get_connection_values_from_oauth_response
 from flask.ext.social.datastore import SQLAlchemyConnectionDatastore
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin, login_required,login_user
+from flask.ext.security import Security, SQLAlchemyUserDatastore, login_user
 from flask_security.core import current_user
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit
 from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
 
@@ -24,9 +21,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 
 app.config['SOCIAL_GOOGLE'] = {
-                'consumer_key':os.environ['GOOGLE_ID'],
-                'consumer_secret':os.environ['GOOGLE_SECRET']
-                }
+                               'consumer_key': os.environ['GOOGLE_ID'],
+                               'consumer_secret': os.environ['GOOGLE_SECRET']
+                              }
 
 app.secret_key = os.environ['SECRET']
 
@@ -103,30 +100,26 @@ elif async_mode == 'gevent':
     monkey.patch_all()
 
 socketio = SocketIO(app, async_mode=async_mode)
-@app.before_first_request
-def do_this():
-    if not Role.query.first():
-        db.create_all()
-        user_datastore.create_role(name="admin",description="")
-        user_datastore.create_role(name="user",description="")
-        db.session.commit()
+
 
 @socketio.on('buy')
 def buy(message):
     c_id = message['data']
 
     comic = Comic.query.filter_by(id=c_id).one()
-    current_user.bought_comics.append(comic)                                  # Updating the bought relation
+    current_user.bought_comics.append(comic)
     db.session.commit()
     emit('my response')
+
 
 @socketio.on('unbuy')
 def unbuy(message):
     c_id = message['data']
-    comic = db.session.query(Comic).filter_by(id=c_id).one()                  # Getting specific comic
-    current_user.bought_comics.remove(comic)                                  # Updating the bought relation
+    comic = db.session.query(Comic).filter_by(id=c_id).one()
+    current_user.bought_comics.remove(comic)
     db.session.commit()
     emit('my response')
+
 
 @socketio.on('disconnect')
 def test_disconnect():
