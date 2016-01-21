@@ -1,7 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/angular-motion/dist/angular-motion.min.css') }}">
+    </head>
+    <body  ng-app="myApp">
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  </body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" bs-navbar>
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">Comic Book Time</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li data-match-route="/"><a href="/">Home</a></li>
+            <li data-match-route="/find"><a href="/find">Search</a></li>
+            <li data-match-route="/my_collection"><a href="/my_collection">My Collection</a></li>
+          </ul>
+        </nav>
+      {% block content %}
+      {% endblock %}
+
+      <script src="{{ url_for('static', filename='bower_components/angular/angular.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='bower_components/angular-bootstrap/ui-bootstrap.min.js') }}"></script>
+      <script src="{{ url_for('static', filename='bower_components/angular-strap/dist/angular-strap.js') }}"></script>
+      <script src="{{url_for('static', filename='js/app.js')}}"></script>
+      <script src="{{url_for('static', filename='js/controllers/main.js')}}"></script>
+
+    </body>
 </html>

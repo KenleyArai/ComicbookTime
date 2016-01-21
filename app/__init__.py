@@ -9,11 +9,12 @@ from flask_security.core import current_user
 from flask_socketio import SocketIO, emit
 from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
+from flask.ext.triangle import Triangle
 
 import os
 
 app = Flask(__name__)
-
+Triangle(app)
 
 app.config['DEBUG'] = os.environ["DEBUG"]
 app.config['SQLALCHEMY_ECHO'] = False

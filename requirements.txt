@@ -12,7 +12,10 @@ config==0.3.9
 discovery==0.0.4
 Django==1.9.1
 docutils==0.12
+flake8==2.5.1
+flake8-docstrings==0.2.4
 Flask==0.10.1
+Flask-Assets==0.11
 flask-heroku==0.1.9
 Flask-Login==0.3.2
 Flask-Mail==0.9.1
@@ -40,13 +43,17 @@ Jinja2==2.8
 jmespath==0.9.0
 Mako==1.0.3
 MarkupSafe==0.23
+mccabe==0.3.1
 oauth2==1.9.0.post1
 oauth2client==1.5.2
 passlib==1.6.5
+pep257==0.7.0
+pep8==1.7.0
 Pillow==3.1.0
 psycopg2==2.6.1
 pyasn1==0.1.9
 pyasn1-modules==0.0.8
+pyflakes==1.0.0
 python-dateutil==2.4.2
 python-editor==0.5
 python-engineio==0.8.6
@@ -62,6 +69,7 @@ SQLAlchemy==1.0.11
 uritemplate==0.6
 urllib3==1.14
 virtualenv==13.1.2
+webassets==0.11.1
 Werkzeug==0.11.3
 wheel==0.24.0
 WTForms==2.1
