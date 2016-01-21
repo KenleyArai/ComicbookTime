@@ -1,6 +1,4 @@
 __pycache__/
 *.pyc
 *.DS_Store
-comics.db
-app/static/covers/*.png
-.ropeproject/
+app/static/bower_components
