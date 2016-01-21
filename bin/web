@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$FLASK_ENV" == "DEV" ]; then
+        python run.py
+else
+        gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
+fi
