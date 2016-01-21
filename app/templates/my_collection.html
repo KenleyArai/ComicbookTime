@@ -1,45 +1,4 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if subs %}
-<div class="row">
-{% for series in subs%}
-<div class="col-xs-6 col-md-4">
-  <a href="#" class="pop">
-  <figure class="stack stack-sidegrid active">
-      {% for c in series[:4] %}
-      <img class="img-rounded" comic-id="{{c.id}}" src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{c.id}}.jpg" />
-      {% endfor %}
-
-      {% for c in series[4:] %}
-      <img style="visibility:hidden" comic-id="{{c.id}}" class="img-rounded" src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{c.id}}.jpg" />
-      {% endfor %}
-  </figure>
-  </a>
-</div>
-{% endfor %}
-</div>
-
-<div class="modal fade bs-example-modal-lg" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" >
-      <div class="modal-content"  >              
-        <div class="modal-body">
-          <div class=row>
-          <div class="col-md-12">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          </div>
-          </div>
-             <div class="row" id="imagesList"></div>
-        </div> 
-   </div>
- </div>
-
-{% else %}
-<div class="jumbotron">
-  <h1>Try it out!<h1>
-    <p>Looks like you don't have anything in your collection yet!</p>
-</div>
-
-{% endif %}
-
 {% endblock %}

@@ -1,18 +1,4 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if comics %}
-{% from "macros.html" import print_mobile,get_page_nav %}
-
-{{ print_mobile(comics)  }}
-{{ get_page_nav(comics)  }}
-
-{% else %}
-<div class="jumbotron">
-  <h1>Try it out!<h1>
-    <p>Start out by signing up with Google, or search without logging in!</p>
-</div>
-
-{% endif %}
-
 {% endblock %}

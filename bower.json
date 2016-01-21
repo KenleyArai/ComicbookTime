@@ -1,0 +1,23 @@
+{
+  "name": "ComicbookTime",
+  "homepage": "https://github.com/KenleyArai/ComicbookTime",
+  "authors": [
+    "Kenley Arai <me@kenleyarai.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "angularjs":"~1.4.8"
+  }
+}
