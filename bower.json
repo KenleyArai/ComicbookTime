@@ -26,7 +26,7 @@
     "ui-navbar": "~0.4.2",
     "swipe-li": "*"
   },
-"resolutions": {
-    "angular": "1.2.0-rc.2"
+  "resolutions": {
+      "angular": "~1.4.9"
   }
 }
