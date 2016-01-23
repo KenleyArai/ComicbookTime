@@ -25,5 +25,8 @@
     "bootstrap": "~3.3.6",
     "ui-navbar": "~0.4.2",
     "swipe-li": "*"
+  },
+"resolutions": {
+    "angular": "1.2.0-rc.2"
   }
 }
