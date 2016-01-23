@@ -1,4 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
+{% if job_id %}
+    <script type="text/ng-template" id="accept-content.html">
+     <div class="icon-ok"><i class="fa fa-check"></i></div>
+    </script>
+    {%raw%}
+    <script type="text/ng-template" id="reject-content.html">
+      <div class="icon-cancel"><i class="fa">{{value.title | lowercase }}</i></div>
+    </script>
+    {%endraw%}
 
+    <script type="text/ng-template" id="sample-content.html">
+      <div class="main-content"><img ng-src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{value.id | angular}}.jpg"></div>
+    </script>
+{% raw %}
+
+<div ng-repeat="(key, value) in stuff">
+        <div
+          swipe-li
+          class="value"
+          disabled="false"
+          intent="true"
+          accept="done(item)"
+          reject="skip(item)"
+          main-content="'sample-content.html'"
+          accept-content="'accept-content.html'"
+          reject-content="'reject-content.html'"
+          reset-to-content="false"
+          ng-class="{invert: 'true'}"
+        ></div>
+</div>
+{% endraw %}
+{% else %}
+<div class="container">
+    <div class="jumbotron">
+        <h1>Welcome!</h1>
+        <p class="lead">AngularJS App Powered By Python Flask</p>
+        <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

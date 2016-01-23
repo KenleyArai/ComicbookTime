@@ -1,3 +1,24 @@
+body {
+  padding-top: 50px;
+}
+
+.image {
+   position: relative;
+   width: 100%; /* for IE 6 */
+}
+
+h2 {
+   position: absolute;
+   top: 200px;
+   left: 0;
+   width: 100%;
+}
+
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
 .stack {
 	margin: 20px auto;
 	width: 400px;
@@ -27,7 +48,7 @@
 }
 
 .stack.active img:nth-child(3) {
-	transform-origin: 80% 30%; 
+	transform-origin: 80% 30%;
 }
 
 .stack.active img:nth-child(2) {
@@ -120,4 +141,3 @@ img.not-avail {
   -ms-transform: scale(1);
   transform: scale(1);
 }
-

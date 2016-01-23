@@ -11,9 +11,20 @@ from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
 from flask.ext.triangle import Triangle
 
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+
+from rq import Queue
+import worker
+
+conn = worker.conn
+
 import os
 
 app = Flask(__name__)
+q = Queue(connection=conn)
 Triangle(app)
 
 app.config['DEBUG'] = os.environ["DEBUG"]
@@ -41,22 +52,8 @@ user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
 heroku.init_app(app)
-from views.index import index
-from views.find import find
-from views.my_collection import my_collection
-from views.series import series
-from views.login import auth
-from views.marvel_update import marvel_update
-from views.bought import bought
 
-app.register_blueprint(index)
-app.register_blueprint(find)
-app.register_blueprint(my_collection)
-app.register_blueprint(series)
-app.register_blueprint(auth)
-app.register_blueprint(marvel_update)
-app.register_blueprint(bought)
-
+from views import index
 
 @login_failed.connect_via(app)
 def on_login_failed(sender, provider, oauth_response):

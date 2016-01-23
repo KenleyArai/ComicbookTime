@@ -120,7 +120,7 @@ class Comic(db.Model):
                 'title': self.title,
                 'source_url': self.source_url,
                 'image_link': self.image_link,
-                'release_date': datetime.date(self.release_date),
+                'release_date': datetime.date(self.release_date).isoformat(),
                 'series_id': self.series_id}
 
     def __repr__(self):
