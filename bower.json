@@ -24,9 +24,12 @@
     "angular-motion": "~0.4.3",
     "bootstrap": "~3.3.6",
     "ui-navbar": "~0.4.2",
-    "swipe-li": "*"
+    "swipe-li": "*",
+    "angular-dynamic-layout": "~0.1.10",
+    "angular-deckgrid": "~0.5.0",
+    "image-engine-angular": "~1.0.0"
   },
   "resolutions": {
-      "angular": "~1.4.9"
+    "angular": "~1.4.9"
   }
 }

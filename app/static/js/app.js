@@ -1,9 +1,10 @@
 
-var app = angular.module('myApp', ['swipeLi','ui.bootstrap','mgcrea.ngStrap'])
+var app = angular.module('myApp', ['swipeLi','ui.bootstrap','mgcrea.ngStrap','akoenig.deckgrid','ngMaterial','ngAnimate'])
 
 app.controller('MainController', function($scope, $http, $timeout) {
     $scope.value = 1;
     $scope.job_id = ""
+    $scope.now = new Date();
     var polling = function(){
         if($scope.stuff){
             return false;
@@ -20,7 +21,7 @@ app.controller('MainController', function($scope, $http, $timeout) {
         $timeout(function(){
             $scope.value++;
             polling();
-        }, 5000);
+        }, 1000);
     };
     polling();
 });

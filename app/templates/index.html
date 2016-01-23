@@ -2,4 +2,21 @@
 
 {% block content %}
 
+<script type="text/ng-template" id="card.html">
+    <md-card>
+        <md-card-title-media>
+        <div ng-if="card.avail">
+            <img class="md-card-image" ng-src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+        </div>
+        <div ng-if="card.avail === false">
+            <img class="not-avail md-card-image" ng-src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+        </div>
+        </md-card-title-media>
+        <md-card-title>
+            {{card.title | angular}}
+        </md-card-title>
+    </md-card>
+</script>
+
+<div deckgrid class="deckgrid" source="stuff" cardTemplate="card.html"></div>
 {% endblock %}

@@ -7,7 +7,9 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/bootstrap/dist/css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/angular-motion/dist/angular-motion.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='bower_components/swipe-li/dist/swipe-li.css') }}">
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+
     </head>
     <body  ng-controller="MainController" ng-init="job_id='{{job_id}}'">
 
@@ -50,6 +52,10 @@
     <script src="{{ url_for('static', filename='bower_components/hammerjs/hammer.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/angular-touch/angular-touch.js') }}"></script>
     <script src="{{ url_for('static', filename='bower_components/swipe-li/dist/swipe-li.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-deckgrid/angular-deckgrid.js')}}"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js')}}"></script>
 
     </body>
