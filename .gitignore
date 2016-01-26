@@ -3,3 +3,4 @@ __pycache__/
 *.DS_Store
 node_modules/
 app/static/bower_components
+.env
