@@ -27,7 +27,8 @@
     "swipe-li": "*",
     "angular-dynamic-layout": "~0.1.10",
     "angular-deckgrid": "~0.5.0",
-    "image-engine-angular": "~1.0.0"
+    "image-engine-angular": "~1.0.0",
+    "angular-lazy-img": "~1.2.2"
   },
   "resolutions": {
     "angular": "~1.4.9"

@@ -26,17 +26,20 @@
                 </div>
                 <div class="collapse navbar-collapse" bs-collapse-target>
                     <ul class="nav navbar-nav">
-                        <li data-match-route="/"><a href="/">Home</a></li>
-                        <li data-match-route="/find"><a href="/find">Search</a></li>
-                        <li data-match-route="/my_collection"><a href="/my_collection">My Collection</a></li>
+                        <li data-match-route="/"><a href="/"><i class="fa fa-home fa-1x"></i></a></li>
+                        <li data-match-route="/find"><a href="/find"><i class="fa fa-search fa-1x"></i></a></li>
+                        <li data-match-route="/my_collection"><a href="/my_collection"><i class="fa fa-book fa-1x"></i></a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
+                        {% if login %}
                         <li><a href="/logout">logout</a></li>
+                        {% else %}
                         <li>
                             <form action="{{ url_for('social.login', provider_id='google') }}" method="POST">
                                 <button type='submit' class="btn btn-social-icon btn-google navbar-right navbar-btn">            <span class="fa fa-google"></span></button>
                             </form>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
@@ -56,6 +59,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-lazy-img/release/angular-lazy-img.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js')}}"></script>
 
     </body>
