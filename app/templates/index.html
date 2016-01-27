@@ -3,7 +3,7 @@
 {% block content %}
 
 <script type="text/ng-template" id="card.html">
-    <md-card>
+        <md-card>
         <md-card-title-media>
         <div ng-if="card.avail">
             <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
@@ -15,8 +15,22 @@
         <md-card-title>
             {{card.title | angular}}
         </md-card-title>
-    </md-card>
+        </md-card>
 </script>
+<div class="center-block">
+<div deckgrid class="deckgrid" source="filtered_comics" cardTemplate="card.html"></div>
+</div>
+<div class="center-block">
+<pagination
+      ng-model="currentPage"
+      total-items="comics.length"
+      max-size="20"
+      boundary-links="true">
+</pagination>
+</div>
 
-<div deckgrid class="deckgrid" source="stuff" cardTemplate="card.html"></div>
+{% raw %}
+{{ get_comics() }}
+{% endraw %}
+
 {% endblock %}

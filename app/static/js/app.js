@@ -1,44 +1,35 @@
 
-var app = angular.module('myApp', ['swipeLi','ui.bootstrap','mgcrea.ngStrap','akoenig.deckgrid','ngMaterial','ngAnimate', 'angularLazyImg'])
+var app = angular.module('myApp', ['btford.socket-io','swipeLi','ui.bootstrap','mgcrea.ngStrap','akoenig.deckgrid','ngMaterial','ngAnimate', 'angularLazyImg'])
 
-app.controller('MainController', function($scope, $http, $timeout) {
-    $scope.value = 1;
-    $scope.job_id = ""
-    $scope.now = new Date();
-    var polling = function(){
-        if($scope.stuff){
-            return false;
-        }
-        var value = $http({
-            method: 'GET',
-            url: 'results/' + $scope.job_id
+app.factory('socket', function (socketFactory) {
+    var myIoSocket = io.connect('http://' + document.domain + ':' + location.port + "/");
+
+    mySocket = socketFactory({
+        ioSocket: myIoSocket
+    });
+    return mySocket;
+});
+app.controller('MainController', function($scope, socket) {
+    $scope.comics = [],
+    $scope.filtered_comics = [],
+    $scope.currentPage = 1,
+    $scope.numPerPage = 6;
+
+    socket.forward('send_comics', $scope);
+
+    $scope.$on('socket:send_comics', function (ev, data) {
+        $scope.comics = data
+        $scope.$watch('currentPage + numPerPage', function() {
+            var begin = (($scope.currentPage - 1) * $scope.numPerPage)
+            , end = begin + $scope.numPerPage;
+
+            $scope.filtered_comics = $scope.comics.slice(begin, end);
         });
+    });
 
-        value.success(function(data, status, headers, config){
-            $scope.stuff = data;
-        });
-
-        $timeout(function(){
-            $scope.value++;
-            polling();
-        }, 1000);
+    $scope.get_comics = function () {
+        socket.emit('get_comics');
     };
-    polling();
+
+
 })
-app.directive('imageonload', function() {
-    return {
-        link: function(scope, element) {
-                  element.on('load', function() {
-                    // Set visibility: true + remove spinner overlay
-                      element.removeClass('spinner-hide');
-                      element.addClass('spinner-show');
-                      element.parent().find('span').remove();
-                  });
-                  scope.$watch('src', function() {
-                    // Set visibility: false + inject temporary spinner overlay
-                      element.addClass('spinner-hide');
-                      // element.parent().append('<span class="spinner"></span>');
-                  });
-                }
-            };
-        });

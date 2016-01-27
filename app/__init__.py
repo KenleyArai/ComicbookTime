@@ -28,6 +28,7 @@ q = Queue(connection=conn)
 Triangle(app)
 
 app.config['DEBUG'] = os.environ["DEBUG"]
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
@@ -45,6 +46,7 @@ heroku = Heroku()
 
 Mobility(app)
 db = SQLAlchemy(app)
+
 from app.models import User, Role, Connection, Comic
 
 # Setup Flask-Security
@@ -99,27 +101,21 @@ elif async_mode == 'gevent':
 
 socketio = SocketIO(app, async_mode=async_mode)
 
+@socketio.on("get_comics")
+def get_comics():
+    user = User.query.filter_by(id=current_user.id).one()
+    series = user.follows_series
+    bought = user.bought_comics
 
-@socketio.on('buy')
-def buy(message):
-    c_id = message['data']
+    comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.asc())
+    comics = [x.get_dict() for x in comics.all()]
 
-    comic = Comic.query.filter_by(id=c_id).one()
-    current_user.bought_comics.append(comic)
-    db.session.commit()
-    emit('my response')
+    emit('send_comics', comics, broadcast=True)
 
+@socketio.on('joined_message')
+def joined_chat(data):
+    emit('message', data, broadcast=True)
 
-@socketio.on('unbuy')
-def unbuy(message):
-    c_id = message['data']
-    comic = db.session.query(Comic).filter_by(id=c_id).one()
-    current_user.bought_comics.remove(comic)
-    db.session.commit()
-    emit('my response')
-
-
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected', request.sid)
-    emit('my response')
+@socketio.on('send_message')
+def handle_message(data):
+    emit('message', data, broadcast=True)
