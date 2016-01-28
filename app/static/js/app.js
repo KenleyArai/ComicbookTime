@@ -1,6 +1,8 @@
 
-var app = angular.module('myApp', ['btford.socket-io','swipeLi','ui.bootstrap','mgcrea.ngStrap','akoenig.deckgrid','ngMaterial','ngAnimate', 'angularLazyImg'])
-
+var app = angular.module('myApp', ['btford.socket-io',
+                         'ui.bootstrap',
+                         'mgcrea.ngStrap']
+)
 app.factory('socket', function (socketFactory) {
     var myIoSocket = io.connect('http://' + document.domain + ':' + location.port + "/");
 
@@ -9,27 +11,26 @@ app.factory('socket', function (socketFactory) {
     });
     return mySocket;
 });
-app.controller('MainController', function($scope, socket) {
+
+app.controller('HomeController', function($scope, socket) {
     $scope.comics = [],
-    $scope.filtered_comics = [],
-    $scope.currentPage = 1,
-    $scope.numPerPage = 6;
+    socket.emit('get_comics');
 
     socket.forward('send_comics', $scope);
 
     $scope.$on('socket:send_comics', function (ev, data) {
         $scope.comics = data
-        $scope.$watch('currentPage + numPerPage', function() {
-            var begin = (($scope.currentPage - 1) * $scope.numPerPage)
-            , end = begin + $scope.numPerPage;
-
-            $scope.filtered_comics = $scope.comics.slice(begin, end);
-        });
     });
+})
 
-    $scope.get_comics = function () {
-        socket.emit('get_comics');
-    };
+app.controller('SearchController', function($scope, socket){
+    $scope.query = "";
+    $scope.comics = [],
 
+    socket.emit('get_all_comics');
+    socket.forward('send_comics', $scope);
 
+    $scope.$on('socket:send_comics', function (ev, data) {
+        $scope.comics = data
+    });
 })

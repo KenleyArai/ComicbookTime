@@ -1,36 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div ng-controller="HomeController">
+
+{% if login %}
 
 <script type="text/ng-template" id="card.html">
         <md-card>
-        <md-card-title-media>
-        <div ng-if="card.avail">
+            <md-card-title-media>
             <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
-        </div>
-        <div ng-if="card.avail === false">
-            <img class="not-avail md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
-        </div>
-        </md-card-title-media>
-        <md-card-title>
-            {{card.title | angular}}
-        </md-card-title>
+            <div ng-if="card.avail === false">
+                <img class="not-avail md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
+            </md-card-title-media>
+            <md-card-title>
+                {{card.title | angular}}
+            </md-card-title>
         </md-card>
 </script>
 <div class="center-block">
-<div deckgrid class="deckgrid" source="filtered_comics" cardTemplate="card.html"></div>
-</div>
-<div class="center-block">
-<pagination
-      ng-model="currentPage"
-      total-items="comics.length"
-      max-size="20"
-      boundary-links="true">
-</pagination>
+<div deckgrid class="deckgrid" source="comics" cardTemplate="card.html"></div>
 </div>
 
-{% raw %}
-{{ get_comics() }}
-{% endraw %}
 
+{% else %}
+
+<div class="jumbotron">
+  <h1>Hello, world!</h1>
+  <p>...</p>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+</div>
+
+{% endif %}
+</div>
 {% endblock %}

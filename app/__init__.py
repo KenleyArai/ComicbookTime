@@ -11,6 +11,7 @@ from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
 from flask.ext.triangle import Triangle
 
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -34,9 +35,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 
 app.config['SOCIAL_GOOGLE'] = {
-                               'consumer_key': os.environ['GOOGLE_ID'],
-                               'consumer_secret': os.environ['GOOGLE_SECRET']
-                              }
+                       'consumer_key': os.environ['GOOGLE_ID'],
+                       'consumer_secret': os.environ['GOOGLE_SECRET']
+                      }
 
 app.secret_key = os.environ['SECRET']
 
@@ -55,7 +56,7 @@ security = Security(app, user_datastore)
 social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
 heroku.init_app(app)
 
-from views import index
+from views import index, search
 
 @login_failed.connect_via(app)
 def on_login_failed(sender, provider, oauth_response):
@@ -110,12 +111,20 @@ def get_comics():
     comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.asc())
     comics = [x.get_dict() for x in comics.all()]
 
-    emit('send_comics', comics, broadcast=True)
+    emit('send_comics', comics)
+
+@socketio.on("get_all_comics")
+def get_all_comics():
+    comics = [x.get_dict() for x in Comic.query.all()]
+    emit('send_comics', comics)
 
 @socketio.on('joined_message')
 def joined_chat(data):
-    emit('message', data, broadcast=True)
+    emit('message', data)
 
 @socketio.on('send_message')
 def handle_message(data):
-    emit('message', data, broadcast=True)
+    emit('message', data)
+
+
+from assets import assets
