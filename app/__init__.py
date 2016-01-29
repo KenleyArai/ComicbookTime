@@ -125,6 +125,3 @@ def joined_chat(data):
 @socketio.on('send_message')
 def handle_message(data):
     emit('message', data)
-
-
-from assets import assets

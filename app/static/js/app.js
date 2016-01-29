@@ -1,7 +1,9 @@
 
 var app = angular.module('myApp', ['btford.socket-io',
                          'ui.bootstrap',
-                         'mgcrea.ngStrap']
+                         'mgcrea.ngStrap',
+                         'akoenig.deckgrid',
+                         'angularLazyImg']
 )
 app.factory('socket', function (socketFactory) {
     var myIoSocket = io.connect('http://' + document.domain + ':' + location.port + "/");
