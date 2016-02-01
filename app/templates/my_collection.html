@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if subs %}
-<div class="row">
-{% for series in subs%}
-<div class="col-xs-6 col-md-4">
-  <a href="#" class="pop">
-  <figure class="stack stack-sidegrid active">
-      {% for c in series[:4] %}
-      <img class="img-rounded" comic-id="{{c.id}}" src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{c.id}}.jpg" />
-      {% endfor %}
+<div ng-controller="MyCollection">
+    <ol ng-hide="!hideme" class="breadcrumb">
+        <li><a ng-click="hideme=!hideme">My Collection</a></li>
+        <li class="active">{{key|angular}}</li>
+        <li>
+            <button ng-click="unsubscribe()" type="button" class="btn btn-primary" ng-model="singleModel">
+                Un-Subscribe
+            </button>
+        </li>
+    </ol>
 
-      {% for c in series[4:] %}
-      <img style="visibility:hidden" comic-id="{{c.id}}" class="img-rounded" src="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{c.id}}.jpg" />
-      {% endfor %}
-  </figure>
-  </a>
+    <script type="text/ng-template" id="card.html">
+        <md-card>
+            <div ng-if="card.avail === true">
+                <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
+            <div ng-if="card.avail === false">
+                <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
+                <md-card-actions layout="row">
+                <div ng-if="card.avail === true">
+                <md-button ng-click="mother.unbought(card.id)" class="md-icon-button" aria-label="Bought">
+                  <i  class="fa fa-times fa-2x"></i>
+                </md-button>
+              </md-card-actions>
+            </div>
+        </md-card>
+    </script>
+
+    <div ng-hide="!hideme" deckgrid class="deckgrid" source="selected" cardTemplate="card.html"></div>
+
+    <div ng-hide="hideme" class="row">
+        <div class="col-xs-6 col-md-4" ng-repeat="(key, data) in series">
+          <figure ng-click="select(key,data);" class="stack stack-sidegrid active">
+              <img ng-repeat="card in data" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+          </figure>
+          </a>
+        </div>
+    </div>
+
 </div>
-{% endfor %}
-</div>
-
-<div class="modal fade bs-example-modal-lg" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" >
-      <div class="modal-content"  >              
-        <div class="modal-body">
-          <div class=row>
-          <div class="col-md-12">
-          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          </div>
-          </div>
-             <div class="row" id="imagesList"></div>
-        </div> 
-   </div>
- </div>
-
-{% else %}
-<div class="jumbotron">
-  <h1>Try it out!<h1>
-    <p>Looks like you don't have anything in your collection yet!</p>
-</div>
-
-{% endif %}
-
 {% endblock %}

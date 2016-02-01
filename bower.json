@@ -1,0 +1,34 @@
+{
+  "name": "ComicbookTime",
+  "homepage": "https://github.com/KenleyArai/ComicbookTime",
+  "authors": [
+    "Kenley Arai <me@kenleyarai.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3",
+    "bootstrap": "~3.3.6",
+    "angular-bootstrap": "~1.1.1",
+    "angular-strap": "~2.3.7",
+    "angular-socket-io": "~0.7.0",
+    "angular-deckgrid": "~0.5.0",
+    "angular-lazy-img": "~1.2.2",
+    "ngAnimate": "*",
+    "angular-animate": "~1.4.9",
+    "angular-material": "~1.0.4"
+  },
+  "resolutions": {
+    "angular": "~1.4.9"
+  }
+}

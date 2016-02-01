@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ $FLASK_ENV="DEV" ]; then
+        newrelic-admin run-program python run.py
+else
+        newrelic-admin run-program gunicorn -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
+fi

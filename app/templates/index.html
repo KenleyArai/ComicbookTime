@@ -1,17 +1,37 @@
 {% extends "base.html" %}
+
 {% block content %}
+<div ng-controller="HomeController">
 
-{% if comics %}
-{% from "macros.html" import print_rows,get_page_nav %}
+{% if login %}
+<script type="text/ng-template" id="card.html">
+    <md-card class="fade-in-out" ng-hide="card.hide">
+        <div ng-if="card.avail === true">
+            <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+        </div>
+        <div ng-if="card.avail === false">
+            <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+        </div>
+            <md-card-actions layout="row">
+            <div ng-if="card.avail === true">
+            <md-button ng-click="mother.bought(card.id)" class="md-icon-button" aria-label="Bought">
+              <i  class="fa fa-check fa-2x"></i>
+            </md-button>
+          </md-card-actions>
+        </div>
+    </md-card>
+</script>
 
-{{ print_rows(comics, 3, 3, login)  }}
-{{ get_page_nav(comics)  }}
+<div deckgrid class="deckgrid" source="comics" cardTemplate="card.html"></div>
+
 {% else %}
+
 <div class="jumbotron">
-  <h1>Try it out!<h1>
-    <p>Start out by signing up with Google, or search without logging in!</p>
+  <h1>Hello, world!</h1>
+  <p>...</p>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
 </div>
 
 {% endif %}
-
+</div>
 {% endblock %}

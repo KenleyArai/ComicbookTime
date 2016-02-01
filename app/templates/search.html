@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid" ng-controller="SearchController">
+    <ol ng-hide="!hideme" class="breadcrumb">
+        <li><a ng-click="hideme=!hideme">Search</a></li>
+        <li class="active">
+            <button ng-click="subscribe()" type="button" class="btn btn-primary" ng-model="singleModel">
+                Subscribe
+            </button>
+        </li>
+    </ol>
+
+    <script type="text/ng-template" id="card.html">
+        <md-card>
+            <div ng-if="card.avail === true">
+                <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
+            <div ng-if="card.avail === false">
+                <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
+            </div>
+        </md-card>
+    </script>
+
+    <div class="input-group input-group-lg">
+        <span class="input-group-addon" id="sizing-addon1"><i class="fa fa-search"></i></span>
+        <input type="text" class="form-control" ng-model="query" aria-describedby="sizing-addon1">
+    </div>
+
+    <div ng-hide="!hideme" deckgrid class="deckgrid" source="selected" cardTemplate="card.html"></div>
+
+    <div ng-hide="hideme" class="row">
+        <div class="col-xs-1 col-md-4" ng-repeat="card in comics | filter:{title:query} | orderBy:'release_date':reverse">
+            <md-card ng-click="select(card.series_id);">
+                <md-card-title-media>
+                <div ng-if="card.avail === true">
+                    <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+                </div>
+                <div ng-if="card.avail === false">
+                    <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+                </div>
+                </md-card-title-media>
+            </md-card>
+        </div>
+    </div>
+</div>
+{% endblock %}

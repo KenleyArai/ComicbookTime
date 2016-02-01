@@ -1,32 +1,45 @@
-from flask import Flask,render_template,session,request
+from flask import Flask, render_template, session, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask.ext.social import Social, login_failed
 from flask.ext.social.views import connect_handler
 from flask.ext.social.utils import get_connection_values_from_oauth_response
 from flask.ext.social.datastore import SQLAlchemyConnectionDatastore
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
-from flask.ext.security import Security, SQLAlchemyUserDatastore, \
-    UserMixin, RoleMixin, login_required,login_user
+from flask.ext.security import Security, SQLAlchemyUserDatastore, login_user
 from flask_security.core import current_user
-from flask_socketio import SocketIO, emit, join_room, leave_room
+from flask_socketio import SocketIO, emit
 from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
+from flask.ext.triangle import Triangle
+from itertools import groupby
+import json
+
+
+import os,sys,inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0,parentdir)
+
+from rq import Queue
+import worker
+
+conn = worker.conn
 
 import os
 
 app = Flask(__name__)
-
+q = Queue(connection=conn)
+Triangle(app)
 
 app.config['DEBUG'] = os.environ["DEBUG"]
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["DATABASE_URL"]
 
 
 app.config['SOCIAL_GOOGLE'] = {
-                'consumer_key':os.environ['GOOGLE_ID'],
-                'consumer_secret':os.environ['GOOGLE_SECRET']
-                }
+                       'consumer_key': os.environ['GOOGLE_ID'],
+                       'consumer_secret': os.environ['GOOGLE_SECRET']
+                      }
 
 app.secret_key = os.environ['SECRET']
 
@@ -36,29 +49,16 @@ heroku = Heroku()
 
 Mobility(app)
 db = SQLAlchemy(app)
-from app.models import User, Role, Connection, Comic
+
+from app.models import User, Role, Connection, Comic, Series
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
 heroku.init_app(app)
-from views.index import index
-from views.find import find
-from views.my_collection import my_collection
-from views.series import series
-from views.login import auth
-from views.marvel_update import marvel_update
-from views.bought import bought
 
-app.register_blueprint(index)
-app.register_blueprint(find)
-app.register_blueprint(my_collection)
-app.register_blueprint(series)
-app.register_blueprint(auth)
-app.register_blueprint(marvel_update)
-app.register_blueprint(bought)
-
+from views import index, search, my_collection
 
 @login_failed.connect_via(app)
 def on_login_failed(sender, provider, oauth_response):
@@ -103,32 +103,76 @@ elif async_mode == 'gevent':
     monkey.patch_all()
 
 socketio = SocketIO(app, async_mode=async_mode)
-@app.before_first_request
-def do_this():
-    if not Role.query.first():
-        db.create_all()
-        user_datastore.create_role(name="admin",description="")
-        user_datastore.create_role(name="user",description="")
+
+@socketio.on("get_comics")
+def get_comics():
+    series = current_user.follows_series
+    bought = current_user.bought_comics
+
+    comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.asc())
+    comics = [x.get_dict() for x in comics.all()]
+
+    emit('send_comics', comics)
+
+@socketio.on("get_collection")
+def get_collection():
+    bought = current_user.bought_comics
+    groups = []
+    uniquekeys = []
+    for k, g in groupby(bought, lambda x: x.series_id):
+       groups.append(list(g))
+
+    for l in groups:
+        l.sort(key=lambda x: x.release_date, reverse=True)
+    d = {}
+    for g in groups:
+        title = g[0].title[:-4]
+        d[title] = [x.get_dict() for x in g]
+    emit('send_comics', d)
+
+@socketio.on("get_all_comics")
+def get_all_comics():
+    comics = [x.get_dict() for x in Comic.query.all()]
+    emit('send_comics', comics)
+
+@socketio.on('joined_message')
+def joined_chat(data):
+    emit('message', data)
+
+@socketio.on('send_message')
+def handle_message(data):
+    emit('message', data)
+
+@socketio.on('bought')
+def bought(id):
+    comic = Comic.query.filter_by(id=id).one()
+    current_user.bought_comics.append(comic)
+    db.session.commit()
+    emit('success', "0")
+
+@socketio.on('unbought')
+def unbought(id):
+    comic = Comic.query.filter_by(id=id).one()
+    current_user.bought_comics.remove(comic)
+    db.session.commit()
+    emit('success', "0")
+
+@socketio.on('get_series')
+def send_series(series_id):
+    series_comics = Comic.query.filter_by(series_id=series_id).all()
+    series = [x.get_dict() for x in series_comics]
+
+    emit('send_series', series)
+
+@socketio.on('subscribe')
+def subscribe(series_id):
+    series_comics = Series.query.filter_by(id=series_id).one()
+    if series_comics not in current_user.follows_series:
+        current_user.follows_series.append(series_comics)
         db.session.commit()
 
-@socketio.on('buy')
-def buy(message):
-    c_id = message['data']
-
-    comic = Comic.query.filter_by(id=c_id).one()
-    current_user.bought_comics.append(comic)                                  # Updating the bought relation
+@socketio.on('unsubscribe')
+def unsubscribe(series_id):
+    series_comics = Series.query.filter_by(id=series_id).one()
+    current_user.follows_series.remove(series_comics)
     db.session.commit()
-    emit('my response')
-
-@socketio.on('unbuy')
-def unbuy(message):
-    c_id = message['data']
-    comic = db.session.query(Comic).filter_by(id=c_id).one()                  # Getting specific comic
-    current_user.bought_comics.remove(comic)                                  # Updating the bought relation
-    db.session.commit()
-    emit('my response')
-
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected', request.sid)
-    emit('my response')
