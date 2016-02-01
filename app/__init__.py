@@ -142,3 +142,17 @@ def joined_chat(data):
 @socketio.on('send_message')
 def handle_message(data):
     emit('message', data)
+
+@socketio.on('bought')
+def bought(id):
+    comic = Comic.query.filter_by(id=id).one()
+    current_user.bought_comics.append(comic)
+    db.session.commit()
+    emit('success', "0")
+
+@socketio.on('unbought')
+def unbought(id):
+    comic = Comic.query.filter_by(id=id).one()
+    current_user.bought_comics.remove(comic)
+    db.session.commit()
+    emit('success', "0")
