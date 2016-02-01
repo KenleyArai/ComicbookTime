@@ -1,4 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div ng-controller="MyCollection">
+    <ol ng-hide="!hideme" class="breadcrumb">
+        <li><a ng-click="hideme=!hideme">My Collection</a></li>
+        <li class="active">{{key|angular}}</li>
+    </ol>
+
+    <script type="text/ng-template" id="card.html">
+            <md-card>
+                <md-card-title-media>
+                <div ng-if="card.avail === true">
+                    <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+                </div>
+                <div ng-if="card.avail === false">
+                    <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+                </div>
+                </md-card-title-media>
+                <md-card-title>
+                    {{card.title | angular}}
+                </md-card-title>
+            </md-card>
+    </script>
+    <div ng-hide="!hideme" deckgrid class="deckgrid" source="selected" cardTemplate="card.html"></div>
+
+    <div ng-hide="hideme" class="row">
+        <div class="col-xs-6 col-md-4" ng-repeat="(key, data) in series">
+          <figure ng-click="select(key,data);" class="stack stack-sidegrid active">
+              <img ng-repeat="card in data" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+          </figure>
+          </a>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

@@ -8,9 +8,11 @@
 <script type="text/ng-template" id="card.html">
         <md-card>
             <md-card-title-media>
-            <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            <div ng-if="card.avail === true">
+                <img class="md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+            </div>
             <div ng-if="card.avail === false">
-                <img class="not-avail md-card-image" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
+                <img class="md-card-image not-avail" lazy-img="https://s3-us-west-1.amazonaws.com/comicbooktime/covers/{{card.id | angular}}.jpg">
             </div>
             </md-card-title-media>
             <md-card-title>
@@ -18,10 +20,8 @@
             </md-card-title>
         </md-card>
 </script>
-<div class="center-block">
-<div deckgrid class="deckgrid" source="comics" cardTemplate="card.html"></div>
-</div>
 
+<div deckgrid class="deckgrid" source="comics" cardTemplate="card.html"></div>
 
 {% else %}
 

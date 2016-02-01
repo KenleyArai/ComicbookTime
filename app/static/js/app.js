@@ -25,6 +25,26 @@ app.controller('HomeController', function($scope, socket) {
     });
 })
 
+app.controller('MyCollection', function($scope, socket) {
+    $scope.series = [],
+    $scope.hideme = false,
+    $scope.key = "",
+    socket.emit('get_collection');
+
+    socket.forward('send_comics', $scope);
+
+    $scope.$on('socket:send_comics', function (ev, data) {
+        $scope.series = data
+    });
+
+    $scope.select = function(key,data) {
+        $scope.key = key;
+        $scope.selected = data;
+        $scope.hideme = ! $scope.hideme;
+    }
+    $scope.selected = {};
+})
+
 app.controller('SearchController', function($scope, socket){
     $scope.query = "";
     $scope.comics = [],

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask.ext.social import Social, login_failed
 from flask.ext.social.views import connect_handler
@@ -10,6 +10,8 @@ from flask_socketio import SocketIO, emit
 from flask.ext.heroku import Heroku
 from flask.ext.mobility import Mobility
 from flask.ext.triangle import Triangle
+from itertools import groupby
+import json
 
 
 import os,sys,inspect
@@ -56,7 +58,7 @@ security = Security(app, user_datastore)
 social = Social(app, SQLAlchemyConnectionDatastore(db, Connection))
 heroku.init_app(app)
 
-from views import index, search
+from views import index, search, my_collection
 
 @login_failed.connect_via(app)
 def on_login_failed(sender, provider, oauth_response):
@@ -104,14 +106,29 @@ socketio = SocketIO(app, async_mode=async_mode)
 
 @socketio.on("get_comics")
 def get_comics():
-    user = User.query.filter_by(id=current_user.id).one()
-    series = user.follows_series
-    bought = user.bought_comics
+    series = current_user.follows_series
+    bought = current_user.bought_comics
 
     comics = Comic.query.filter(Comic.series_id.in_(p.id for p in series) & Comic.id.notin_(p.id for p in bought)).order_by(Comic.release_date.asc())
     comics = [x.get_dict() for x in comics.all()]
 
     emit('send_comics', comics)
+
+@socketio.on("get_collection")
+def get_collection():
+    bought = current_user.bought_comics
+    groups = []
+    uniquekeys = []
+    for k, g in groupby(bought, lambda x: x.series_id):
+       groups.append(list(g))
+
+    for l in groups:
+        l.sort(key=lambda x: x.release_date, reverse=True)
+    d = {}
+    for g in groups:
+        title = g[0].title[:-4]
+        d[title] = [x.get_dict() for x in g]
+    emit('send_comics', d)
 
 @socketio.on("get_all_comics")
 def get_all_comics():
