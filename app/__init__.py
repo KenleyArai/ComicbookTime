@@ -175,5 +175,4 @@ def subscribe(series_id):
 def unsubscribe(series_id):
     series_comics = Series.query.filter_by(id=series_id).one()
     current_user.follows_series.remove(series_comics)
-    print current_user.follows_series
     db.session.commit()
