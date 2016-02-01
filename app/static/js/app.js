@@ -29,6 +29,10 @@ app.controller('SearchController', function($scope, socket){
     $scope.query = "";
     $scope.comics = [],
 
+    $scope.$watch('query', function() {
+       $scope.$emit('lazyImg:refresh');
+    });
+
     socket.emit('get_all_comics');
     socket.forward('send_comics', $scope);
 
