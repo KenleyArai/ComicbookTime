@@ -66,6 +66,11 @@ app.controller('MyCollection', function($scope, socket) {
     $scope.unbought = function(id){
         socket.emit('unbought', id)
     }
+    $scope.unsubscribe = function(){
+        var series_id = $scope.selected[0].series_id
+        socket.emit('unsubscribe', series_id);
+        $scope.hideme = !$scope.hideme
+    }
 })
 
 app.controller('SearchController', function($scope, socket){
@@ -78,24 +83,32 @@ app.controller('SearchController', function($scope, socket){
     });
 
     socket.emit('get_all_comics');
+
     socket.forward('send_comics', $scope);
+    socket.forward('send_series', $scope);
 
     $scope.$on('socket:send_comics', function (ev, data) {
         $scope.comics = data
     });
 
-    $scope.$watch('hideme', function() {
+    $scope.$on('socket:send_series', function (ev, data) {
+        $scope.selected = data
+    });
+
+    $scope.$watch('selected', function() {
        $scope.$emit('lazyImg:refresh');
     });
 
-    $scope.select = function(key,data) {
-        $scope.key = key;
-        $scope.selected = data;
-        $scope.hideme = ! $scope.hideme;
-    }
     $scope.selected = {};
 
-    $scope.unbought = function(id){
-        socket.emit('unbought', id)
+    $scope.select = function(series_id) {
+        socket.emit('get_series', series_id);
+        $scope.hideme = ! $scope.hideme;
+    }
+
+    $scope.subscribe = function(){
+        var series_id = $scope.selected[0].series_id
+        socket.emit('subscribe', series_id);
+        $scope.hideme = !$scope.hideme
     }
 })

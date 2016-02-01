@@ -50,7 +50,7 @@ heroku = Heroku()
 Mobility(app)
 db = SQLAlchemy(app)
 
-from app.models import User, Role, Connection, Comic
+from app.models import User, Role, Connection, Comic, Series
 
 # Setup Flask-Security
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
@@ -156,3 +156,24 @@ def unbought(id):
     current_user.bought_comics.remove(comic)
     db.session.commit()
     emit('success', "0")
+
+@socketio.on('get_series')
+def send_series(series_id):
+    series_comics = Comic.query.filter_by(series_id=series_id).all()
+    series = [x.get_dict() for x in series_comics]
+
+    emit('send_series', series)
+
+@socketio.on('subscribe')
+def subscribe(series_id):
+    series_comics = Series.query.filter_by(id=series_id).one()
+    if series_comics not in current_user.follows_series:
+        current_user.follows_series.append(series_comics)
+        db.session.commit()
+
+@socketio.on('unsubscribe')
+def unsubscribe(series_id):
+    series_comics = Series.query.filter_by(id=series_id).one()
+    current_user.follows_series.remove(series_comics)
+    print current_user.follows_series
+    db.session.commit()

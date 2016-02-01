@@ -5,6 +5,11 @@
     <ol ng-hide="!hideme" class="breadcrumb">
         <li><a ng-click="hideme=!hideme">My Collection</a></li>
         <li class="active">{{key|angular}}</li>
+        <li>
+            <button ng-click="unsubscribe()" type="button" class="btn btn-primary" ng-model="singleModel">
+                Un-Subscribe
+            </button>
+        </li>
     </ol>
 
     <script type="text/ng-template" id="card.html">
